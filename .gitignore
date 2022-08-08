@@ -1,0 +1,5 @@
+.vscode/
+server/.env
+app/node_modules
+server/node_modules
+app/.env

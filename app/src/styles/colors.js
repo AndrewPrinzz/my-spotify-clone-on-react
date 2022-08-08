@@ -1,0 +1,6 @@
+export const base = 'white'
+export const gray = '#787376'
+export const dark = '#1A1A1A'
+export const danger = '#ef5350'
+export const lightgray = '#282828'
+export const blue = '#1f2a4a'

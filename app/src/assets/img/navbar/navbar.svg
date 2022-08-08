@@ -1,0 +1,21 @@
+<svg width="421" height="1701" viewBox="0 0 421 1701" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g clip-path="url(#clip0_22:4)">
+<rect width="421" height="1701" fill="url(#paint0_linear_22:4)"/>
+<rect width="421" height="1784" fill="url(#paint1_diamond_22:4)"/>
+</g>
+<defs>
+<linearGradient id="paint0_linear_22:4" x1="3.50833" y1="87.0591" x2="453.325" y2="109.339" gradientUnits="userSpaceOnUse">
+<stop stop-color="#292929"/>
+<stop offset="1" stop-color="#1E1322"/>
+</linearGradient>
+<radialGradient id="paint1_diamond_22:4" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(465 -113.783) rotate(99.8657) scale(3315.01 812.356)">
+<stop stop-color="#2676D2" stop-opacity="0.37"/>
+<stop stop-color="#2676D2" stop-opacity="0"/>
+<stop offset="0.24213" stop-color="#180C19" stop-opacity="0.975521"/>
+<stop offset="0.82506" stop-color="#180C19"/>
+</radialGradient>
+<clipPath id="clip0_22:4">
+<rect width="421" height="1701" fill="white"/>
+</clipPath>
+</defs>
+</svg>

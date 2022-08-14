@@ -1,6 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import {jsx} from '@emotion/react'
-import {useAccessToken, usePlayer} from 'context/auth-context'
+import {useAccessToken} from 'context/auth-context'
+import {usePlayer} from 'context/player-context'
 
 import React from 'react'
 import SpotifyPlayer from 'react-spotify-web-playback'

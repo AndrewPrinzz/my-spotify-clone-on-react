@@ -16,7 +16,6 @@ function UnauthenticatedApp() {
   )
 }
 
-
 function Login() {
   return (
     <LoginContainer>

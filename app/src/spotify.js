@@ -8,7 +8,7 @@ import {Play} from "components/icons"
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
 import {SearchResults} from 'components/search-results'
 import {ErrorBoundary} from 'react-error-boundary'
-import {usePlayer} from 'context/auth-context'
+import {usePlayer} from 'context/player-context'
 import axios from 'axios'
 import {SearchBox} from 'components/lib'
 
@@ -96,7 +96,7 @@ function SpotifySearchTracksDataView({data}) {
   )
 }
 
-function ErrorFallback({error, resetErrorBoundary}) {
+function ErrorFallback({error, resetErrorBoundary, ...props}) {
   return (
     <div role="alert">
       There was an error {' '}
@@ -116,8 +116,6 @@ function SearchForm({
   onChange,
   onSubmit
 }) {
-
-  // const {searchResults, setSearch} = useSpotifySearch2({accessToken})
 
   const [searchQuery, setSearchQuery] = React.useState(initialSearchQuery)
 

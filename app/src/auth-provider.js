@@ -1,10 +1,47 @@
 const localStorageKey = '__auth_provider_token__'
 
-async function getToken() {
+async function getToken(code) {
   // if we were a real auth provider, this is where we would make a request
   // to retrieve the user's token. (It's a bit more complicated than that...
   // but you're probably not an auth provider so you don't need to worry about it).
-  return window.localStorage.getItem(localStorageKey)
+  const [accessToken, setAccessToken] = React.useState()
+  const [refreshToken, setRefreshToken] = React.useState()
+  const [expiresIn, setExpiresIn] = React.useState()
+
+  React.useEffect(() => {
+    axios.post(`${REACT_APP_URL}/login`, {
+      code: code
+    }).then(res => {
+      setAccessToken(res.data.accessToken)
+      setRefreshToken(res.data.refreshToken)
+      setExpiresIn(res.data.expiresIn)
+      window.history.pushState({}, null, '/')
+    }).catch((err) => {
+      console.log('err 1: ', err);
+      window.location = '/'
+    })
+  }, [code])
+
+  React.useEffect(() => {
+    if (!refreshToken || !expiresIn) return
+    const interval = setInterval(() => {
+      axios.post(`${REACT_APP_URL}/refresh`, {
+        refreshToken
+      }).then(res => {
+        setAccessToken(res.data.accessToken)
+        setExpiresIn(res.data.expiresIn)
+      }).catch((err) => {
+        console.log('err 2: ', err);
+        window.location = '/'
+      })
+    }, (expiresIn - 60) * 1000);
+
+    return () => clearInterval(interval)
+  }, [refreshToken, expiresIn])
+
+  return accessToken
+
+  // return window.localStorage.getItem(localStorageKey)
 }
 
 function handleUserResponse({ user }) {

@@ -12,9 +12,11 @@ import {Player} from 'components/player'
 import {useSpotifyData} from 'utils/hooks'
 import {QueryDataCacheProvider} from 'context/query-data-cache-context'
 import {useQueryDataCache} from 'context/query-data-cache-context'
-import {useAccessToken, useSpotifyWebAPI} from 'context/auth-context'
+import {useAccessToken} from 'context/auth-context'
+import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
 
-function QuerySection({ searchQuery }) {
+function QuerySection({searchQuery}) {
+
   return (
     <QueryDataCacheProvider>
       <div className="query-info">
@@ -59,9 +61,8 @@ function SpotifySearchQueryInfo({searchQuery}) {
   const spotifyApi = useSpotifyWebAPI()
   // caching data for a better user expirience
   const [cache, dispatch] = useQueryDataCache()
-
-
-  const {status, data: searchData, setData, error, run} = useSpotifyData({
+  
+  const {status, data: searchData, setData, error, run: client} = useSpotifyData({
     status: searchQuery ? 'pending' : 'idle',
     delay: false
   })
@@ -75,7 +76,7 @@ function SpotifySearchQueryInfo({searchQuery}) {
       setData(cache[searchQuery])
     }
     else {
-      run(
+      client(
         spotifyApi.searchTracks(searchQuery)
           .then(searchQueryData => {
             // for caching purposese
@@ -85,7 +86,7 @@ function SpotifySearchQueryInfo({searchQuery}) {
       )
 
     }
-  }, [searchQuery, run])
+  }, [searchQuery, client])
 
   // write a component for handling player data because it doesn't render so there's always an error
   if (status === 'idle') {

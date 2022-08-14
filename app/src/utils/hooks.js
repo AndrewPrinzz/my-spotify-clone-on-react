@@ -4,25 +4,40 @@ import SpotifyWebApi from 'spotify-web-api-node'
 
 const REACT_APP_URL = 'http://localhost:3001'
 
+const LOCALSTORAGE_KEYS = {
+  accessToken: '__auth_provider_access_token__',
+  refreshToken: '__auth_provider_refresh_token__',
+  expireTime: '__auth_provider_expire_time__',
+  timeStamp: '__auth_provider_token_timestamp__',
+}
+
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.REACT_APP_CLIENT_ID
 })
 
-function useAuth(code) {
-  const [accessToken, setAccessToken] = React.useState()
-  const [refreshToken, setRefreshToken] = React.useState()
-  const [expiresIn, setExpiresIn] = React.useState()
+function useAuth() {
+  const code = new URLSearchParams(window.location.search).get('code')
+
+  const [accessToken, setAccessToken] = useLocalStorageState('__auth_provider_access_token__')
+  const [refreshToken, setRefreshToken] = useLocalStorageState('__auth_provider_refresh_token__')
+  const [expiresIn, setExpiresIn] = useLocalStorageState('__auth_provider_expire_time__')
+  const [timeStamp, setTimestamp] = useLocalStorageState('__auth_provider_token_timestamp__')
 
   React.useEffect(() => {
+    // if we have access token in our localStorage then we do nothing
+    if (!code) return
+    
     axios.post(`${REACT_APP_URL}/login`, {
       code: code
     }).then(res => {
-      console.log('res: ', res)
       setAccessToken(res.data.accessToken)
       setRefreshToken(res.data.refreshToken)
       setExpiresIn(res.data.expiresIn)
+      setTimestamp(Date.now())
+      
       window.history.pushState({}, null, '/')
     }).catch((err) => {
+      console.log('err 1: ', err);
       window.location = '/'
     })
   }, [code])
@@ -35,10 +50,12 @@ function useAuth(code) {
       }).then(res => {
         setAccessToken(res.data.accessToken)
         setExpiresIn(res.data.expiresIn)
+        setTimestamp(Date.now())
       }).catch((err) => {
         console.log('err 2: ', err);
         window.location = '/'
       })
+      // calc time the token will expire (spoiler: it's 3600ms)
     }, (expiresIn - 60) * 1000);
 
     return () => clearInterval(interval)
@@ -47,13 +64,18 @@ function useAuth(code) {
   return accessToken
 }
 
-function useLocalStorageState(key, defaultValue = 'active', {
-  serialize = JSON.stringify,
-  deserialize = JSON.parse,
-} = {}) {
+// Usage: `const [localStorage, setLocalStorage] = useLocalStorageState('key', 'value')`
+// or
+// `const [localStorage, setLocalStorage] = useLocalStorageState('value')`
+// `useLocalStorageState('value')`
+function useLocalStorageState(
+  key, 
+  defaultValue = '', 
+  {serialize = JSON.stringify, deserialize = JSON.parse} = {},
+) {
   // find out the current variant and get the current item out of the local storage
   const [state, setState] = React.useState(() => {
-    const valueInLocalStorage = window.localStorage.getItem(key) || defaultValue
+    const valueInLocalStorage = window.localStorage.getItem(key)
     if (valueInLocalStorage) {
       // parse the value we've got
       return deserialize(valueInLocalStorage)
@@ -62,6 +84,8 @@ function useLocalStorageState(key, defaultValue = 'active', {
     return typeof defaultValue === 'function' ? defaultValue() : defaultValue
   }
   )
+
+  React.useDebugValue(`${key}: ${serialize(state)}`)
 
   // if the key changes we want to remove this so we need to track it. It's better for perfomance because we don't trigger rerender
   const prevKeyRef = React.useRef(key)
@@ -195,4 +219,103 @@ function useSpotifyData({delay, ...initialState} = {}) {
   }
 }
 
-export {useAuth, useLocalStorageState, useSpotifyData}
+function useSafeDispatch2(dispatch) {
+  // make sure we don't call this function if our component has been unmounted
+  const mounted = React.useRef(false)
+  // `useEffect` fires synchronously after all DOM mutations. `useLayoutEffect` will be flushed synchronously, before the browser has a chance to paint.
+  React.useLayoutEffect(() => {
+     // set this to true when value is mounted
+    mounted.current = true
+    // return a cleanup function which will be called when we’re getting unmounted
+    return () => (mounted.current = false)
+  }, [])
+  return React.useCallback(
+    // if mounter we can call unsafeDispatch function. We take and paste any number of args
+    (...args) => (mounted.current ? dispatch(...args) : void 0),
+    [dispatch],
+  )
+}
+
+// Example usage:
+// const {data, error, status, run} = useSpotifyData2()
+// React.useEffect(() => {
+//   run(fetchPokemon(pokemonName))
+// }, [pokemonName, run])
+const defaultInitialState = {status: 'idle', data: null, error: null, delay: false}
+function useSpotifyData2(initialState) {
+  const initialStateRef = React.useRef({
+    ...defaultInitialState,
+    ...initialState,
+  })
+  const [{status, data, error, delay}, setState] = React.useReducer(
+    // we don't create a helper useReducer function. We're gonna create it above instead. Look at the `setSafeState`. The first argument we should pass is our state and the second one is our action
+    (s, a) => ({...s, ...a}),
+    initialStateRef.current,
+  )
+
+  const safeSetState = useSafeDispatch2(setState)
+
+  // set data for caching purposes
+  const setData = React.useCallback(
+    data => safeSetState({data, status: 'resolved'}),
+    [safeSetState],
+  )
+  // set error for caching purposes
+  const setError = React.useCallback(
+    error => safeSetState({error, status: 'rejected'}),
+    [safeSetState],
+  )
+  const reset = React.useCallback(
+    () => safeSetState(initialStateRef.current),
+    [safeSetState],
+  )
+
+  // memorized function. We don't wanna create a new one everytime we use/run it
+  const run = React.useCallback(
+    promise => {
+      if (!promise || !promise.then) {
+        throw new Error(
+          `The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?`,
+        )
+      }
+      safeSetState({status: 'pending'})
+      return promise.then(
+        data => {
+          // we do that to be able to set delay shotrly 
+          const returnData = () => {setData(data); return data}
+          // setting delay for testing purposes
+          delay ? 
+            setTimeout(() => 
+              returnData(), 
+              // setting delay for testing purposes. delay: true sets delay for 1500. Or we set our own delay
+              typeof(delay) !== 'number' ? 1500 : delay) :
+              // if delay is false we show the data immediately
+              returnData()
+        },
+        error => {
+          setError(error)
+          return Promise.reject(error)
+        },
+      )
+    },
+    [safeSetState, setData, setError],
+  )
+
+  return {
+    // using the same names that react-query uses for convenience
+    isIdle: status === 'idle',
+    isLoading: status === 'pending',
+    isError: status === 'rejected',
+    isSuccess: status === 'resolved',
+
+    setData,
+    setError,
+    error,
+    status,
+    data,
+    run,
+    reset,
+  }
+}
+
+export {useAuth, useLocalStorageState, useSpotifyData, useSpotifyData2}

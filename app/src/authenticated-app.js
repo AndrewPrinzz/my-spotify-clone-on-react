@@ -11,8 +11,9 @@ import {Search} from 'screens/search'
 import {Playlists} from 'screens/playlists'
 import {NotFoundScreen} from 'screens/not-found'
 import {Home} from 'screens/home'
-import {useAuth} from 'utils/hooks'
-import {useCode, useSpotifyWebAPI, useAccessToken} from 'context/auth-context'
+import {useAuth, useLocalStorageState} from 'utils/hooks'
+import {useAccessToken} from 'context/auth-context'
+import {useCode, useSpotifyWebAPI} from 'context/spotify-web-api-context'
 
 // If we have an error
 function ErrorFallback({error}) {
@@ -31,15 +32,22 @@ function ErrorFallback({error}) {
 }
 
 function AuthenticatedApp() {
+  const [localStorageToken, setLocalStorageToken] = useLocalStorageState('__auth_provider_access_token__')
+
   const spotifyApi = useSpotifyWebAPI()
-  const code = useCode()
-  const accessToken = useAuth(code)
+  
+  const accessTokenFromUseAuth = useAuth()
+  const accessToken = localStorageToken ? localStorageToken : accessTokenFromUseAuth
+  // const accessToken = accessTokenFromUseAuth
+
   const [, setAccessToken] = useAccessToken()
 
   React.useEffect(() => {
     if (!accessToken) return
     spotifyApi.setAccessToken(accessToken)
     setAccessToken(accessToken)
+    // we need to set access token directly to local storage and then also manage expires in
+    setLocalStorageToken(accessToken)
   }, [accessToken])
   
 

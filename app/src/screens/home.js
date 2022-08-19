@@ -6,7 +6,7 @@ import {Greeting, PlayListItems,ChartBlock, ChartBlocks, InterfaceDspr, Interfac
 import {ChartTrackTemplate} from 'components/chart'
 import {chart} from 'test/chart-data'
 import {Browse} from 'components/lib'
-import {useSpotifyData, useSpotifyData2} from 'utils/hooks'
+import {useSpotifyData, useSpotifyData2, useLocalStorageState} from 'utils/hooks'
 import {ErrorBoundary} from 'react-error-boundary'
 import {
   SpotifyPlaylistInfoFallback,
@@ -19,11 +19,12 @@ import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
 
 function SpotifyPlaylistInfo() {
   const [accessToken] = useAccessToken()
+  
   const spotifyApi = useSpotifyWebAPI()
 
   const {status, data, error, run} = useSpotifyData2({
     status: 'pending',
-    delay: 3000
+    // delay: 3000
   })
   
   const endpointData = {
@@ -52,6 +53,11 @@ function SpotifyPlaylistInfo() {
 }
 
 function Home() {
+  const [accessToken] = useLocalStorageState('__auth_provider_access_token__')
+
+  React.useEffect(() => {
+    if (!accessToken) return
+  }, [accessToken])
   return (
     <Browse>
       {/* Playlists */}

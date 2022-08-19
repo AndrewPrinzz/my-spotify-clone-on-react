@@ -1,15 +1,9 @@
 import React from 'react'
 import axios from 'axios'
 import SpotifyWebApi from 'spotify-web-api-node'
+import {useAccessToken} from 'context/auth-context'
 
 const REACT_APP_URL = 'http://localhost:3001'
-
-const LOCALSTORAGE_KEYS = {
-  accessToken: '__auth_provider_access_token__',
-  refreshToken: '__auth_provider_refresh_token__',
-  expireTime: '__auth_provider_expire_time__',
-  timeStamp: '__auth_provider_token_timestamp__',
-}
 
 const spotifyApi = new SpotifyWebApi({
   clientId: process.env.REACT_APP_CLIENT_ID
@@ -18,7 +12,7 @@ const spotifyApi = new SpotifyWebApi({
 function useAuth() {
   const code = new URLSearchParams(window.location.search).get('code')
 
-  const [accessToken, setAccessToken] = useLocalStorageState('__auth_provider_access_token__')
+  const [accessToken, setAccessToken] = useAccessToken('__auth_provider_access_token__')
   const [refreshToken, setRefreshToken] = useLocalStorageState('__auth_provider_refresh_token__')
   const [expiresIn, setExpiresIn] = useLocalStorageState('__auth_provider_expire_time__')
   const [timeStamp, setTimestamp] = useLocalStorageState('__auth_provider_token_timestamp__')
@@ -48,6 +42,8 @@ function useAuth() {
       axios.post(`${REACT_APP_URL}/refresh`, {
         refreshToken
       }).then(res => {
+        console.log('Access token has been refreshed');
+
         setAccessToken(res.data.accessToken)
         setExpiresIn(res.data.expiresIn)
         setTimestamp(Date.now())

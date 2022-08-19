@@ -12,8 +12,9 @@ import {Player} from 'components/player'
 import {useSpotifyData} from 'utils/hooks'
 import {QueryDataCacheProvider} from 'context/query-data-cache-context'
 import {useQueryDataCache} from 'context/query-data-cache-context'
-import {useAccessToken} from 'context/auth-context'
+import {useLocalStorageState} from 'utils/hooks'
 import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
+import {useAccessToken} from 'context/auth-context'
 
 function QuerySection({searchQuery}) {
 
@@ -26,7 +27,7 @@ function QuerySection({searchQuery}) {
         >
           <SpotifySearchQueryInfo searchQuery={searchQuery} />
           <div>
-            <Player />
+            {/* <Player /> */}
           </div>
         </SearchQueryErrorBoundary>
       </div>
@@ -57,7 +58,7 @@ function PreviousQuery({ onSelect }) {
 }
 
 function SpotifySearchQueryInfo({searchQuery}) {
-  const [accessToken] = useAccessToken()
+  const [accessToken] = useAccessToken('__auth_provider_access_token__')
   const spotifyApi = useSpotifyWebAPI()
   // caching data for a better user expirience
   const [cache, dispatch] = useQueryDataCache()

@@ -2,12 +2,14 @@
 import {jsx} from '@emotion/react'
 import {useAccessToken} from 'context/auth-context'
 import {usePlayer} from 'context/player-context'
+import {useLocalStorageState} from 'utils/hooks'
 
 import React from 'react'
 import SpotifyPlayer from 'react-spotify-web-playback'
 
 function Player() {
   const [accessToken] = useAccessToken()
+  
   const [play, setPlay] = React.useState(false)
   // getting track uri
   const [player] = usePlayer()

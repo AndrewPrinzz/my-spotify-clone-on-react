@@ -1,3 +1,6 @@
+/** @jsxImportSource @emotion/react */
+import {jsx} from '@emotion/react'
+
 import React from 'react'
 import {css} from '@emotion/css'
 import * as colors from 'styles/colors'
@@ -13,7 +16,10 @@ import {NotFoundScreen} from 'screens/not-found'
 import {Home} from 'screens/home'
 import {useAuth, useLocalStorageState} from 'utils/hooks'
 import {useAccessToken} from 'context/auth-context'
+import * as auth from 'auth-provider'
 import {useCode, useSpotifyWebAPI} from 'context/spotify-web-api-context'
+import SpotifyWebApi from 'spotify-web-api-node'
+import {Player} from 'components/player'
 
 // If we have an error
 function ErrorFallback({error}) {
@@ -33,23 +39,21 @@ function ErrorFallback({error}) {
 
 function AuthenticatedApp() {
   const [localStorageToken, setLocalStorageToken] = useLocalStorageState('__auth_provider_access_token__')
-
+  
   const spotifyApi = useSpotifyWebAPI()
   
-  const accessTokenFromUseAuth = useAuth()
+  const accessTokenFromUseAuth = auth.getToken()
   const accessToken = localStorageToken ? localStorageToken : accessTokenFromUseAuth
-  // const accessToken = accessTokenFromUseAuth
-
-  const [, setAccessToken] = useAccessToken()
+  const [useAccessTokens, setUseAccessTokens] = useAccessToken(accessToken)
 
   React.useEffect(() => {
-    if (!accessToken) return
-    spotifyApi.setAccessToken(accessToken)
-    setAccessToken(accessToken)
+    if (!accessTokenFromUseAuth) return
+    setLocalStorageToken(accessTokenFromUseAuth)
+    spotifyApi.setAccessToken(accessTokenFromUseAuth)
+    setUseAccessTokens(accessToken)
+
     // we need to set access token directly to local storage and then also manage expires in
-    setLocalStorageToken(accessToken)
   }, [accessToken])
-  
 
   return (
     // Error boundary provider
@@ -64,6 +68,14 @@ function AuthenticatedApp() {
           <ErrorBoundary FallbackComponent={ErrorFallback}>
             <AppRoutes />
           </ErrorBoundary>
+          <div css={{
+            position: 'fixed',
+            bottom: '0',
+            width: '100%',
+            background: '#000'
+          }}>
+            <Player />
+          </div>
         </div>
       </Router>
     </ErrorBoundary>
@@ -116,6 +128,7 @@ function NavLink(props) {
 }
 
 function Nav() {
+
   return (
     <NavBar className={css`
       height: 100vh;
@@ -156,6 +169,15 @@ function Nav() {
           </NavLink>
         </li>
       </ul>
+      <a 
+        css={{
+          marginTop: '30px',
+          color: '#fff',
+          display: 'block',
+          cursor: 'pointer'
+        }} 
+        onClick={auth.logout}
+      >logout</a>
     </NavBar>
   )
 }

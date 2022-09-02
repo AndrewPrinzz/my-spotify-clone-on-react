@@ -2,33 +2,89 @@
 import {jsx}  from '@emotion/react'
 
 import React from 'react'
-import {Greeting, PlayListItems,ChartBlock, ChartBlocks, InterfaceDspr, InterfaceTitle, MusicResults} from 'components/lib'
-import {ChartTrackTemplate} from 'components/chart'
-import {chart} from 'test/chart-data'
+import {Greeting, PlayListItems, RecommendedBlock, RecommendedBlocks, InterfaceDspr, InterfaceTitle, MusicResults, TrackItems} from 'components/lib'
 import {Browse} from 'components/lib'
-import {useSpotifyData, useSpotifyData2, useLocalStorageState} from 'utils/hooks'
+import {
+  useSpotifyData,
+  useLocalStorageState, 
+  // useGetUsersSeeds
+} from 'utils/hooks'
 import {ErrorBoundary} from 'react-error-boundary'
 import {
   SpotifyPlaylistInfoFallback,
   SpotifyPlaylistDataView,
-} from 'spotify'
+} from 'utils/playlists'
+import {
+  SpotifyTrackInfoFallback,
+  SpotifyTrackDataView
+} from 'utils/tracks'
 import {ErrorMessage} from 'components/error-fallbacks'
 import {useAccessToken} from 'context/auth-context'
 import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
 
+function SpotifyRecommendations() {
+  const [accessToken] = useAccessToken()
+  const spotifyApi = useSpotifyWebAPI()
+
+  // getting our seeds
+  const {data: seedsData, status: seedsStatus, error: seedsError, run: seedsRun} = useSpotifyData({
+    status: 'pending',
+  })
+  // getting our data
+  const {status, run, data, error} = useSpotifyData({
+    status: 'pending'
+  })
+  
+  React.useEffect(() => {
+    if (!accessToken) return
+    // getting seeds for top tracks
+    seedsRun(spotifyApi.getMyTopTracks({limit: 5}))
+  }, [accessToken, seedsRun])
+
+  React.useEffect(() => {
+    // make sure we got seeds
+    if (seedsStatus !== 'resolved') return
+    
+    run(spotifyApi.getRecommendations({
+      min_energy: 0.4,
+      // reduce the data to seeds that we need
+      seed_artists: seedsData.body.items.reduce(
+        (prevValue, currentValue) =>
+          prevValue.concat(currentValue.album.artists[0].id),
+        []
+      ),
+      min_popularity: 50,
+      limit: 10
+    }))
+  }, [seedsStatus, run])
+  
+  if (status === 'pending') {
+    return (
+      <SpotifyTrackInfoFallback />
+    )
+  } else if (status === 'rejected') {
+    throw error
+  } else if (status === 'resolved') {
+    return (
+      <SpotifyTrackDataView data={data.body.tracks} />
+    )
+  }
+
+  throw new Error('This should be impossible')
+}
 
 function SpotifyPlaylistInfo() {
   const [accessToken] = useAccessToken()
   
   const spotifyApi = useSpotifyWebAPI()
 
-  const {status, data, error, run} = useSpotifyData2({
+  const {status, data, error, run} = useSpotifyData({
     status: 'pending',
     // delay: 3000
   })
   
   const endpointData = {
-    limit: 4,
+    limit: 3,
     country: 'US',
     locale: 'en_US',
   }
@@ -37,7 +93,7 @@ function SpotifyPlaylistInfo() {
     if (!accessToken) {
       return
     }
-    spotifyApi.setAccessToken(accessToken)
+    
     run(spotifyApi.getFeaturedPlaylists(endpointData))
   }, [accessToken, run])
 
@@ -58,6 +114,7 @@ function Home() {
   React.useEffect(() => {
     if (!accessToken) return
   }, [accessToken])
+
   return (
     <Browse>
       {/* Playlists */}
@@ -67,21 +124,12 @@ function Home() {
           <SpotifyPlaylistInfo />
         </ErrorBoundary>
       </PlayListItems>
-      {/* Chart */}
-      <InterfaceTitle>Smoothly releases</InterfaceTitle>
-      <InterfaceDspr>New releases on Smoothly</InterfaceDspr>
-      <ChartBlocks>
-        <ChartBlock>
-          {chart.slice(0, 5).map(({id, ...props}) => (
-            <ChartTrackTemplate key={id} {...props} />
-          ))}
-        </ChartBlock>
-        <ChartBlock>
-          {chart.slice(5, 10).map(({id, ...props}) => (
-            <ChartTrackTemplate key={id} {...props} />
-          ))}
-        </ChartBlock>
-      </ChartBlocks>
+      {/*  */}
+      <InterfaceTitle>You might like</InterfaceTitle>
+      <InterfaceDspr>Music based on what you like</InterfaceDspr>
+      <TrackItems>
+        <SpotifyRecommendations />
+      </TrackItems>
       {/* Recently Played */}
       {/* <RecentlyPlayed /> */}
     </Browse>

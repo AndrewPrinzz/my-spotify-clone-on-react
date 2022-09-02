@@ -19,7 +19,29 @@ function usePlayer() {
   return context
 }
 
+const OffsetContext = React.createContext()
+OffsetContext.displayName = 'OffsetContext'
+
+function OffsetProvider(props) {
+  const [offset, setOffset] = React.useState()
+
+  const value = [offset, setOffset]
+
+  return <OffsetContext.Provider value={value} {...props} />
+}
+
+function useOffset() {
+  
+  const context = React.useContext(OffsetContext)
+  if (!context) {
+    throw new Error(`Offset must be rendered within the OffsetProvider`)
+  }
+  return context
+}
+
 export {
   PlayerProvider,
-  usePlayer
+  usePlayer,
+  OffsetProvider,
+  useOffset,
 }

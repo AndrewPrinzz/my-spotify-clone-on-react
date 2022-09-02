@@ -3,7 +3,7 @@ import {jsx} from '@emotion/react'
 
 import React from 'react'
 import * as colors from 'styles/colors'
-import {PlaylistItem, PlayListTracks, PlayListItemIcon, MusicResults} from "components/lib"
+import {PlaylistImage, PlayListItem, PlayListTracks, PlayListItemIcon, MusicResults, PlayListTitle} from "components/lib"
 import {Play} from "components/icons"
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
 import {SearchResults} from 'components/search-results'
@@ -11,6 +11,7 @@ import {ErrorBoundary} from 'react-error-boundary'
 import {usePlayer} from 'context/player-context'
 import axios from 'axios'
 import {SearchBox} from 'components/lib'
+import {Link} from 'react-router-dom'
 
 function SpotifyPlaylistInfoFallback({data}) {
 
@@ -37,19 +38,20 @@ function SpotifyPlaylistInfoFallback({data}) {
 function SpotifyPlaylistDataView({data}) {
   
   return (
-    data.map(({images, tracks, id}, index) =>
-      <PlaylistItem
-        key={id ? id : index}
-        color={colors.blue}
-        cover={images[0].url}
-        // playlistHeight={playlistHeight ? `${playlistHeight}` : null}
+    data.map(({images, tracks, id, name}, index) =>
+      <PlayListItem
+        key={index}
       >
+        <Link to={`/artist/${id}`}>
+          <PlaylistImage
+            color={colors.blue}
+            cover={images[0].url}
+          >
+          </PlaylistImage>
+        </Link>
+        <PlayListTitle>{name}</PlayListTitle>
         <PlayListTracks>{tracks.total} tracks</PlayListTracks>
-        {/* <PlayListGenre>{genre}</PlayListGenre> */}
-        <PlayListItemIcon>
-          <Play />
-        </PlayListItemIcon>
-      </PlaylistItem>
+      </PlayListItem>
     )
   )
 }

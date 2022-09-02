@@ -1,5 +1,11 @@
 import React from 'react'
 import {useLocalStorageState} from "utils/hooks"
+import {
+  useAccessToken, 
+  useRefreshToken, 
+  useExpiresIn, 
+  useTimeStamp,
+} from 'context/auth-context'
 import axios from "axios"
 import SpotifyWebApi from 'spotify-web-api-node'
 import UnauthenticatedApp from 'unauthenticated-app'
@@ -7,7 +13,7 @@ import UnauthenticatedApp from 'unauthenticated-app'
 const LOCALSTORAGE_KEYS = {
   accessToken: '__auth_provider_access_token__',
   refreshToken: '__auth_provider_refresh_token__',
-  expireTime: '__auth_provider_expire_time__',
+  expiresIn: '__auth_provider_expire_time__',
   timeStamp: '__auth_provider_token_timestamp__',
 }
 
@@ -18,7 +24,7 @@ const SpotifyApi = new SpotifyWebApi({
 function clearAuthData() {
   window.localStorage.setItem(LOCALSTORAGE_KEYS.accessToken, '')
   window.localStorage.setItem(LOCALSTORAGE_KEYS.refreshToken, '')
-  window.localStorage.setItem(LOCALSTORAGE_KEYS.expireTime, '')
+  window.localStorage.setItem(LOCALSTORAGE_KEYS.expiresIn, '')
   window.localStorage.setItem(LOCALSTORAGE_KEYS.timeStamp, '')
   SpotifyApi.setAccessToken('')
   SpotifyApi.setRefreshToken('')
@@ -27,10 +33,15 @@ function clearAuthData() {
 function useGetToken() {
   const code = new URLSearchParams(window.location.search).get('code')
 
-  const [accessToken, setAccessToken] = useLocalStorageState('__auth_provider_access_token__')
-  const [refreshToken, setRefreshToken] = useLocalStorageState('__auth_provider_refresh_token__')
-  const [expiresIn, setExpiresIn] = useLocalStorageState('__auth_provider_expire_time__')
-  const [timeStamp, setTimestamp] = useLocalStorageState('__auth_provider_token_timestamp__')
+  const [accessToken, setAccessToken] = useAccessToken()
+  const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
+  const [refreshToken, setRefreshToken] = useRefreshToken()
+  const [localStorageRefreshToken, setLocalStorageRefreshToken] = useLocalStorageState(LOCALSTORAGE_KEYS.refreshToken)
+  const [expiresIn, setExpiresIn] = useExpiresIn()
+  const [localStorageExpiresIn, setlocalStorageExpiresIn] = useLocalStorageState(LOCALSTORAGE_KEYS.expiresIn)
+  const [timeStamp, setTimestamp] = useTimeStamp()
+  const [localStorageTimeStamp, setLocalStorageTimeStamp] = useLocalStorageState(LOCALSTORAGE_KEYS.timeStamp)
+  
 
   React.useEffect(() => {
     // if we have access token in our localStorage then we do nothing
@@ -39,16 +50,22 @@ function useGetToken() {
     axios.post(`${process.env.REACT_APP_URL}/login`, {
       code: code
     }).then(res => {
-      console.log('res.data.accessToken: ', res.data.accessToken);
       setAccessToken(res.data.accessToken)
+      setLocalStorageAccessToken(res.data.accessToken)
+
       setRefreshToken(res.data.refreshToken)
+      setLocalStorageRefreshToken(res.data.refreshToken)
+
       setExpiresIn(res.data.expiresIn)
+      setlocalStorageExpiresIn(res.data.expiresIn)
+
       setTimestamp(Date.now())
+      setLocalStorageTimeStamp(Date.now())
 
       window.history.pushState({}, null, '/')
     }).catch((err) => {
       console.log('err 1: ', err);
-      window.location = '/'
+      // window.location = '/'
     })
   }, [code])
 
@@ -58,11 +75,17 @@ function useGetToken() {
       axios.post(`${process.env.REACT_APP_URL}/refresh`, {
         refreshToken
       }).then(res => {
-        console.log('Access token has been refreshed');
-
         setAccessToken(res.data.accessToken)
+        setLocalStorageAccessToken(res.data.accessToken)
+
+        setRefreshToken(res.data.refreshToken)
+        setLocalStorageRefreshToken(res.data.refreshToken)
+
         setExpiresIn(res.data.expiresIn)
+        setlocalStorageExpiresIn(res.data.expiresIn)
+
         setTimestamp(Date.now())
+        setLocalStorageTimeStamp(Date.now())
       }).catch((err) => {
         console.log('err 2: ', err);
         window.location = '/'

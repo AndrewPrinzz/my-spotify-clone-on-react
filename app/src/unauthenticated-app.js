@@ -6,7 +6,7 @@ import {BrowserRouter as Router, Link as RouterLink, Routes, Route, useMatch} fr
 import {Polygon} from 'screens/polygon'
 
 const AUTH_URL =
-  "https://accounts.spotify.com/authorize?client_id=b614d13fd2e74dec81743395e7d0efd6&response_type=code&redirect_uri=http://localhost:3000&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state"
+  "https://accounts.spotify.com/authorize?client_id=b614d13fd2e74dec81743395e7d0efd6&response_type=code&redirect_uri=http://localhost:3000&scope=streaming%20user-read-email%20user-read-private%20user-top-read%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state"
 
 function UnauthenticatedApp() {
   return (

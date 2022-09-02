@@ -48,7 +48,7 @@ export const NavPfp = styled.img`
 `
 
 export const NavName = styled.div`
-  font-size: 28px;
+  font-size: 24px;
   font-weight: 600;
   color: ${colors.base};
 `
@@ -167,23 +167,29 @@ export const PlayListItems = styled.div`
   display: flex;
   justify-content: space-between;
 `
+export const PlayListItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  width: 365px;
+  flex-direction: column;
+`
 
-export const PlaylistItem = styled.div`
+export const PlaylistImage = styled.div`
   display: flex;
   flex-direction: column;
   margin-top: 38px;
   position: relative;
-  width: 237px;
-  height: 339px;
-  border-radius: 50px;
+  width: 365px;
+  height: 365px;
+  border-radius: 12px;
   background-repeat: no-repeat;
   background-size: cover;
   ::before {
-    content: '';
+    /* content: ''; */
     position: absolute;
     height: 140px;
     width: 100%;
-    border-radius: 0px 0px 50px 50px;
+    border-radius: 0px 0px 12px 12px;
     filter: drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.25));
     bottom: 0;
   } 
@@ -201,15 +207,27 @@ export const PlaylistItem = styled.div`
 
 export const PlayListTracks = styled.div`
   width: fit-content;
-  margin-top: 27px;
-  margin-left: auto;
-  margin-right: 26px;
-  font-weight: 600;
-  padding: 2px 7px;
+  margin-top: 5px;
   font-size: 14px;
-  background: rgba(35, 50, 77, 0.47);
-  border-radius: 12px;
-  color: ${colors.base};
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 26px;
+  letter-spacing: 0.02em;
+  color: ${colors.gray};
+`
+
+export const PlayListTitle = styled.div`
+  margin-top: 15px;
+  font-style: normal;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 32px;
+  letter-spacing: 0.02em;
+  color: #FFFFFF;
+  text-shadow: 0px 4px 4px rgba(0, 0, 0, 0.25);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `
 
 export const PlayListGenre = styled.div`
@@ -242,7 +260,7 @@ export const Greeting = styled.div`
   line-height: 61px;
 `
 
-/* chart.js component */
+/* .js component */
 
 export const InterfaceTitle = styled.div`
   margin-top: 60px;
@@ -257,23 +275,29 @@ export const InterfaceDspr = styled.div`
   font-weight: bold;
 `
 
-export const ChartBlocks = styled.div`
+export const RecommendedBlocks = styled.div`
   display: flex;
   justify-content: space-between;
 `
 
-export const ChartBlock = styled.div`
+export const RecommendedBlock = styled.div`
   width: 45%;
-  margin-left: 27px;
+  /* margin-left: 27px; */
   `
 
-export const ChartTrack = styled.div`
+export const Track = styled.div`
   display: flex;
+  width: 48%;
   align-items: center;
   margin-top: 24px;
 `
 
-export const ChartTrackImage = styled.div`
+export const TrackItems = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`
+
+export const TrackImage = styled.div`
   max-width: 70px;
   max-height: 70px;
   position: relative;
@@ -281,11 +305,13 @@ export const ChartTrackImage = styled.div`
   align-items: center;
   font-weight: 600;
   font-size: 20px;
+  /*
   ::before {
     content: ''!important;
     position: absolute;
     left: -27px;
   }
+  */
   img {
     cursor: pointer;
     border-radius: 10px;
@@ -294,27 +320,29 @@ export const ChartTrackImage = styled.div`
     min-width: 70px;
     min-height: 70px;
   }
+  /*
   ${({number}) => ({
     ":before": {
       content: `'${number}'`,
     },
   })}
+  */
 `
 
-export const ChartTrackInfo = styled.div`
+export const TrackInfo = styled.div`
   display: flex;
   flex-direction: column;
   margin-left: 15px;
 `
 
-export const ChartTrackAuthor = styled.div`
+export const TrackAuthor = styled.div`
   font-size: 20px;
   font-weight: 600;
   letter-spacing: 0.01em;
   color: ${colors.base}
 `
 
-export const ChartTrackName = styled.div`
+export const TrackName = styled.div`
   margin-top: 7px;
   font-size: 14px;
   font-weight: 600;
@@ -367,8 +395,7 @@ export const PolygonBlock = styled.div`
 `
 
 export const MusicResults = styled.div`
-  height: 200px;
-  overflow-y: scroll;
+  
 `
 
 export const SpotifyWebPlayerStyled = styled(SpotifyWebPlayer)`

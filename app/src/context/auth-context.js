@@ -1,11 +1,10 @@
 import React from 'react'
-import axios from 'axios'
-import {useAuth, useLocalStorageState} from 'utils/hooks'
+
 
 const LOCALSTORAGE_KEYS = {
   accessToken: '__auth_provider_access_token__',
   refreshToken: '__auth_provider_refresh_token__',
-  expireTime: '__auth_provider_expire_time__',
+  expiresIn: '__auth_provider_expire_time__',
   timeStamp: '__auth_provider_token_timestamp__',
 }
 
@@ -20,15 +19,20 @@ function AccessTokenProvider(props) {
   return <AccessTokenContext.Provider value={value} {...props} />
 }
 
-function useAccessToken() {
-  const context = React.useContext(AccessTokenContext)
-  const [value] = context
-  const localStorageContext = useLocalStorageState()
+function useAccessToken(value) {
+
+  const [accessToken, setAccessToken] = React.useContext(AccessTokenContext)
+
+  const context = [accessToken, setAccessToken]
 
   if (!context) {
     throw new Error(`AccessToken must be rendered within the AccessTokenProvider`)
   }
   return context
+}
+
+function useAccessFakeToken(params) {
+  const [accessToken, setAccessToken] = useAccessToken()
 }
 
 const RefreshTokenContext = React.createContext()
@@ -96,5 +100,6 @@ export {
   ExpiresInProvider,
   useExpiresIn,
   TimeStampProvider,
-  useTimeStamp
+  useTimeStamp,
+  LOCALSTORAGE_KEYS
 }

@@ -1,7 +1,7 @@
 import React from 'react'
 import {AccessTokenProvider, ExpiresInProvider, RefreshTokenProvider, TimeStampProvider} from 'context/auth-context'
 import {CodeProvider, SpotifyWebAPIProvider} from 'context/spotify-web-api-context'
-import {PlayerProvider} from 'context/player-context'
+import {PlayerProvider, OffsetProvider} from 'context/player-context'
 import {QueryDataCacheProvider} from 'context/query-data-cache-context'
 import AuthenticatedApp from './authenticated-app'
 import UnauthenticatedApp from './unauthenticated-app'
@@ -10,6 +10,28 @@ import * as auth from 'auth-provider'
 
 
 const code = new URLSearchParams(window.location.search).get('code')
+
+function AppProviders({children}) {
+  return (
+    <CodeProvider>
+      <SpotifyWebAPIProvider>
+        <AccessTokenProvider>
+          <PlayerProvider>
+            <OffsetProvider>
+              <ExpiresInProvider>
+                <RefreshTokenProvider>
+                  <TimeStampProvider>
+                    {children}
+                  </TimeStampProvider>
+                </RefreshTokenProvider>
+              </ExpiresInProvider>
+            </OffsetProvider>
+          </PlayerProvider>
+        </AccessTokenProvider>
+      </SpotifyWebAPIProvider>
+    </CodeProvider>
+  )
+}
 
 function App() {
   const [localStorageTokenExpireTime] = useLocalStorageState('__auth_provider_expire_time__')
@@ -34,27 +56,14 @@ function App() {
   // check if we have access
   return (
     <>
-      <CodeProvider>
-        <SpotifyWebAPIProvider>
-          <AccessTokenProvider>
-            <PlayerProvider>
-              <ExpiresInProvider>
-                <RefreshTokenProvider>
-                  <TimeStampProvider>
-                    {/* {code ? <AuthenticatedApp /> : <UnauthenticatedApp />} */}
-                    {Boolean(code) || Boolean(isTokenActual.current) ?
-                      <AuthenticatedApp logout={auth.logout} /> : 
-                      <UnauthenticatedApp />
-                    }
-                    {/* <AuthenticatedApp /> */}
-
-                  </TimeStampProvider>
-                </RefreshTokenProvider>
-              </ExpiresInProvider>
-            </PlayerProvider>
-          </AccessTokenProvider>
-        </SpotifyWebAPIProvider>
-      </CodeProvider>
+      <AppProviders>
+        {/* {code ? <AuthenticatedApp /> : <UnauthenticatedApp />} */}
+        {Boolean(code) || Boolean(isTokenActual.current) ?
+          <AuthenticatedApp logout={auth.logout} /> : 
+          <UnauthenticatedApp />
+        }
+        {/* <AuthenticatedApp /> */}
+      </AppProviders>
     </>
   )
   

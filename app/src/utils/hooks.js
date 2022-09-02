@@ -1,18 +1,16 @@
 import React from 'react'
 import axios from 'axios'
 import SpotifyWebApi from 'spotify-web-api-node'
-import {useAccessToken} from 'context/auth-context'
+import {useAccessToken, useRefreshToken, useExpiresIn, useTimeStamp} from 'context/auth-context'
+import * as auth from 'auth-provider'
+import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
 
 const REACT_APP_URL = 'http://localhost:3001'
-
-const spotifyApi = new SpotifyWebApi({
-  clientId: process.env.REACT_APP_CLIENT_ID
-})
 
 function useAuth() {
   const code = new URLSearchParams(window.location.search).get('code')
 
-  const [accessToken, setAccessToken] = useAccessToken('__auth_provider_access_token__')
+  const [accessToken, setAccessToken] = useAccessToken()
   const [refreshToken, setRefreshToken] = useLocalStorageState('__auth_provider_refresh_token__')
   const [expiresIn, setExpiresIn] = useLocalStorageState('__auth_provider_expire_time__')
   const [timeStamp, setTimestamp] = useLocalStorageState('__auth_provider_token_timestamp__')
@@ -104,118 +102,11 @@ function useLocalStorageState(
   return [state, setState]
 }
 
-function asyncReducer(state, action) {
-  switch (action.type) {
-    case 'pending': {
-      return {status: 'pending', data: null, error: null}
-    } 
-    case 'resolved': {
-      return {status: 'resolved', data: action.data, error: null}
-    }
-    case 'rejected': {
-      return {status: 'rejected', data: null, error: action.error}
-    }
-    default: {
-      throw new Error(`Unhandled action type: ${action.type}`)
-    }
-  }
-}
-
-function useSafeDispatch(dispatch) {
-  // make sure we don't call this function if our component has been unmounted
-  const mountedRef = React.useRef(false)
-
-  React.useEffect(() => {
-    // set this to true when value is mounted
-    mountedRef.current = true
-    return () => {
-      // return a cleanup function which will be called when we’re getting unmounted
-      mountedRef.current = false
-    }
-  }, [])
-
-  return React.useCallback((...args) => {
-    // if mounter we can call unsafeDispatch function
-    if (mountedRef.current) {
-      // take and paste any number of args
-      dispatch(...args)
-    }
-    // empty because useReducer dispatch function is stable
-  }, [dispatch])
-
-}
 
 // debug value in React Dev Tools helper function
 const formatDebugValue = ({status, data, error}) => `status: ${status}; data: ${data}; error: ${error}`
 
-function useSpotifyData({delay, ...initialState} = {}) {
-
-  const defaultProps = {
-    country: 'US', 
-    locale: 'en_US',
-    ...initialState
-  }
-  
-  // if you call this function that’s going to trigger a rerender even if the component not unmounted
-  const [state, unsafeDispatch] = React.useReducer(asyncReducer, {
-    status: 'idle',
-    data: null,
-    error: null,
-    ...initialState
-  })
-
-  const {status, data, error} = state
-
-  // To check status of data processing in React Devtools intead of console
-  React.useDebugValue({status: status, data: !!JSON.stringify(data?.body), error: error}, formatDebugValue)
-
-  const dispatch = useSafeDispatch(unsafeDispatch)
-
-  // memorized function. We don't wanna create a new one everytime we use/run it
-  const run = React.useCallback(promise => {
-    dispatch({type: 'pending'})
-    promise
-      .then(
-        data => {
-          // setting delay for testing purposes
-          delay ? 
-            setTimeout(() => 
-              dispatch({type: 'resolved', data: data}), 
-              // setting delay for testing purposes. delay: true sets delay for 1500. Or we set our own delay
-              typeof(delay) !== 'number' ? 1500 : delay) :
-              // if delay is false we show the data immediately
-              dispatch({type: 'resolved', data: data})
-        },
-        error => {
-          console.log('error: ', error);
-          dispatch({type: 'rejected', error: 'There was an error'})
-        }
-      )
-  // dispatch will never change. useReducer ensures that for us. But we pass it for ESLint
-  }, [dispatch])
-
-  // set data for caching purposes
-  const setData = React.useCallback(
-    data => dispatch({type: 'resolved', data}),
-    [dispatch],
-  )
-  // set error for caching purposes
-  const setError = React.useCallback(
-    error => dispatch({type: 'rejected', error}),
-    [dispatch],
-  )
-
-  return {
-    setData, 
-    setError,
-    error,
-    status,
-    data,
-    run
-  }
-}
-
-function useSafeDispatch2(dispatch) {
+function useSafeDispatch(dispatch) {
   // make sure we don't call this function if our component has been unmounted
   const mounted = React.useRef(false)
   // `useEffect` fires synchronously after all DOM mutations. `useLayoutEffect` will be flushed synchronously, before the browser has a chance to paint.
@@ -233,12 +124,22 @@ function useSafeDispatch2(dispatch) {
 }
 
 // Example usage:
-// const {data, error, status, run} = useSpotifyData2()
+// const {data, error, status, run} = useSpotifyData()
 // React.useEffect(() => {
 //   run(fetchPokemon(pokemonName))
 // }, [pokemonName, run])
 const defaultInitialState = {status: 'idle', data: null, error: null, delay: false}
-function useSpotifyData2(initialState) {
+function useSpotifyData(initialState) {
+  // we need to make sure we have access token
+  const [accessToken] = useAccessToken()
+  
+  React.useEffect(() => {
+    if (!accessToken) return
+  }, [accessToken])
+
+  const spotifyWebApi = useSpotifyWebAPI()
+  spotifyWebApi.setAccessToken(accessToken)
+
   const initialStateRef = React.useRef({
     ...defaultInitialState,
     ...initialState,
@@ -249,7 +150,9 @@ function useSpotifyData2(initialState) {
     initialStateRef.current,
   )
 
-  const safeSetState = useSafeDispatch2(setState)
+  React.useDebugValue({status: status, data: !!JSON.stringify(data?.body), error: error}, formatDebugValue)
+  
+  const safeSetState = useSafeDispatch(setState)
 
   // set data for caching purposes
   const setData = React.useCallback(
@@ -277,6 +180,7 @@ function useSpotifyData2(initialState) {
       safeSetState({status: 'pending'})
       return promise.then(
         data => {
+          console.log('data logout: ', data);
           // we do that to be able to set delay shotrly 
           const returnData = () => {setData(data); return data}
           // setting delay for testing purposes
@@ -289,6 +193,10 @@ function useSpotifyData2(initialState) {
               returnData()
         },
         error => {
+          // console.log('error logout ', error);
+          // window.location = '/'
+          // auth.logout()
+          
           setError(error)
           return Promise.reject(error)
         },
@@ -314,4 +222,35 @@ function useSpotifyData2(initialState) {
   }
 }
 
-export {useAuth, useLocalStorageState, useSpotifyData, useSpotifyData2}
+function useGetUsersSeeds() {
+  const [accessToken] = useAccessToken()
+  console.log('accessToken: ', accessToken);
+  const spotifyApi = useSpotifyWebAPI()
+
+  const {data, status, error, run, isSuccess, isLoading} = useSpotifyData({
+    status: 'pending',
+  })
+
+  React.useEffect(() => {
+    if (!accessToken) return
+
+    run(spotifyApi.getMyTopTracks({limit: 5}))
+  }, [run])
+
+  if (status === 'resolved') {
+    // get user's seeds to get recommendations after
+    const data = data.body.items.reduce(
+      (prevValue, currentValue) =>
+      prevValue.concat(currentValue.album.artists[0].id),
+      []
+    )
+    return data 
+  }
+}
+
+export {
+  // useAuth,
+  useLocalStorageState, 
+  useSpotifyData,
+  useGetUsersSeeds
+}

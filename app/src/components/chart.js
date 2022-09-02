@@ -1,19 +1,17 @@
-import {ChartTrackImage, ChartTrackAuthor, ChartTrackInfo, ChartTrackName, ChartTrack} from 'components/lib'
+import {TrackImage, TrackAuthor, TrackInfo, TrackName, Track} from 'components/lib'
 
-
-
-function ChartTrackTemplate({author, name, img, id}) {
+function TrackTemplate({author, name, img, id}) {
   return (
-    <ChartTrack key={id}>
-      <ChartTrackImage number={id}>
+    <Track key={id}>
+      <TrackImage number={id}>
         <img src={img} />
-      </ChartTrackImage>
-      <ChartTrackInfo>
-        <ChartTrackAuthor>{name}</ChartTrackAuthor>
-        <ChartTrackName>{author}</ChartTrackName>
-      </ChartTrackInfo>
-    </ChartTrack>
+      </TrackImage>
+      <TrackInfo>
+        <TrackAuthor>{name}</TrackAuthor>
+        <TrackName>{author}</TrackName>
+      </TrackInfo>
+    </Track>
   )
 }
 
-export {ChartTrackTemplate}
+export {TrackTemplate}

@@ -10,16 +10,19 @@ import {NavBar, NavName, NavPfp, MenuItem } from './components/lib'
 import {Home as HomeIcon, Note as NoteIcon, Playlists as PlaylistIcon } from 'components/icons'
 import {ErrorMessage, FullPageErrorFallback} from 'components/error-fallbacks'
 import pfp from 'assets/img/navbar/pfp.png'
+import {Home} from 'screens/home'
+import {Artist} from 'screens/artist'
 import {Search} from 'screens/search'
 import {Playlists} from 'screens/playlists'
 import {NotFoundScreen} from 'screens/not-found'
-import {Home} from 'screens/home'
-import {useAuth, useLocalStorageState} from 'utils/hooks'
-import {useAccessToken} from 'context/auth-context'
+import {useLocalStorageState} from 'utils/hooks'
+import {useAccessToken, useAccessTokenWithLocalStorage} from 'context/auth-context'
 import * as auth from 'auth-provider'
 import {useCode, useSpotifyWebAPI} from 'context/spotify-web-api-context'
 import SpotifyWebApi from 'spotify-web-api-node'
 import {Player} from 'components/player'
+import {LOCALSTORAGE_KEYS} from 'auth-provider'
+import {useSpotifyData} from 'utils/hooks'
 
 // If we have an error
 function ErrorFallback({error}) {
@@ -38,22 +41,24 @@ function ErrorFallback({error}) {
 }
 
 function AuthenticatedApp() {
-  const [localStorageToken, setLocalStorageToken] = useLocalStorageState('__auth_provider_access_token__')
+  const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
   
   const spotifyApi = useSpotifyWebAPI()
+  const getToken = auth.getToken()
   
-  const accessTokenFromUseAuth = auth.getToken()
-  const accessToken = localStorageToken ? localStorageToken : accessTokenFromUseAuth
-  const [useAccessTokens, setUseAccessTokens] = useAccessToken(accessToken)
+  const getAccessToken = localStorageAccessToken ? localStorageAccessToken : getToken
+  const [, setAccessToken] = useAccessToken()
 
+  // 
   React.useEffect(() => {
-    if (!accessTokenFromUseAuth) return
-    setLocalStorageToken(accessTokenFromUseAuth)
-    spotifyApi.setAccessToken(accessTokenFromUseAuth)
-    setUseAccessTokens(accessToken)
+    if (!getAccessToken) return
 
-    // we need to set access token directly to local storage and then also manage expires in
-  }, [accessToken])
+    // 👩‍🏫 We use this awesome API in the entire app: `https://github.com/thelinmichael/spotify-web-api-node`
+    spotifyApi.setAccessToken(getAccessToken)
+    setAccessToken(getAccessToken)
+    setLocalStorageAccessToken(getAccessToken)
+
+  }, [getAccessToken])
 
   return (
     // Error boundary provider
@@ -128,6 +133,19 @@ function NavLink(props) {
 }
 
 function Nav() {
+  const [accessToken] = useAccessToken()
+  const spotifyWebApi = useSpotifyWebAPI()
+
+  const {status, data, error, run, isLoading, isSuccess} = useSpotifyData({
+    status: 'pending',
+  })
+
+  React.useEffect(() => {
+    if (!accessToken) return
+    
+    run(spotifyWebApi.getMe())
+  }, [accessToken, run])
+
 
   return (
     <NavBar className={css`
@@ -139,8 +157,18 @@ function Nav() {
         display: flex;
         align-items: center;
       `}>
-        <NavPfp src={pfp} />
-        <NavName>Alice</NavName>
+        {isLoading ? (
+          <>
+            <NavPfp src={pfp} />
+            <NavName>Alice</NavName>
+          </>
+        ) : isSuccess ? (
+          <>
+            {/* <NavPfp src={data.body.images[0].url} /> */}
+            <NavPfp src={pfp} />
+            <NavName>{data.body.display_name}</NavName>
+          </>
+        ) : null}
       </div>
       <ul className={css`
         list-style: none;
@@ -188,6 +216,7 @@ function AppRoutes() {
       <Route path="/" element={<Home />} />
       <Route path="/playlists" element={<Playlists />} />
       <Route path="/search" element={<Search />} />
+      <Route path="/artist/:id" element={<Artist />} />
       <Route path="*" element={<NotFoundScreen />} />
     </Routes>
   )

@@ -1,0 +1,1 @@
+export const container = '1167px'

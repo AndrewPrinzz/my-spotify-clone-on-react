@@ -21,6 +21,7 @@ import {
 import {ErrorMessage} from 'components/error-fallbacks'
 import {useAccessToken} from 'context/auth-context'
 import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
+import {timeGreeting} from 'utils/time-greeting'
 
 function SpotifyRecommendations() {
   const [accessToken] = useAccessToken()
@@ -34,37 +35,47 @@ function SpotifyRecommendations() {
   const {status, run, data, error} = useSpotifyData({
     status: 'pending'
   })
+
+  
   
   React.useEffect(() => {
     if (!accessToken) return
     // getting seeds for top tracks
-    seedsRun(spotifyApi.getMyTopTracks({limit: 5}))
+    seedsRun(spotifyApi.getMyTopTracks({limit: 2}))
   }, [accessToken, seedsRun])
 
   React.useEffect(() => {
     // make sure we got seeds
     if (seedsStatus !== 'resolved') return
     
+    console.log(seedsData.body.items.reduce(
+      (prevValue, currentValue) =>
+        prevValue.concat(currentValue.id),
+      []
+    ))
+
     run(spotifyApi.getRecommendations({
       min_energy: 0.4,
       // reduce the data to seeds that we need
-      seed_artists: seedsData.body.items.reduce(
+      seed_tracks: seedsData.body.items.reduce(
         (prevValue, currentValue) =>
-          prevValue.concat(currentValue.album.artists[0].id),
+          prevValue.concat(currentValue.id),
         []
       ),
       min_popularity: 50,
       limit: 10
     }))
-  }, [seedsStatus, run])
+  }, [seedsStatus, run, seedsData])
   
   if (status === 'pending') {
     return (
       <SpotifyTrackInfoFallback />
     )
   } else if (status === 'rejected') {
+    console.log('rejected ', error)
     throw error
   } else if (status === 'resolved') {
+    console.log('resolved recs data ', data)
     return (
       <SpotifyTrackDataView data={data.body.tracks} />
     )
@@ -88,13 +99,14 @@ function SpotifyPlaylistInfo() {
     country: 'US',
     locale: 'en_US',
   }
-
+  
   React.useEffect(() => {
     if (!accessToken) {
       return
-    }
-    
+    } 
+    // test album id 6Kc8A5gqFZjDUeq77xSAK6
     run(spotifyApi.getFeaturedPlaylists(endpointData))
+    // run(spotifyApi.getArtistAlbums('43ZHCT0cAZBISjO8DG9PnE', { limit: 10, offset: 20 }))
   }, [accessToken, run])
 
   if (status === 'pending') {
@@ -118,7 +130,7 @@ function Home() {
   return (
     <Browse>
       {/* Playlists */}
-      <Greeting>Good Evening</Greeting>
+      <Greeting>{timeGreeting}</Greeting>
       <PlayListItems>
         <ErrorBoundary FallbackComponent={ErrorMessage}>
           <SpotifyPlaylistInfo />

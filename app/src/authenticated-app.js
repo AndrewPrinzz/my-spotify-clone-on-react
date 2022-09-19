@@ -11,9 +11,10 @@ import {Home as HomeIcon, Note as NoteIcon, Playlists as PlaylistIcon } from 'co
 import {ErrorMessage, FullPageErrorFallback} from 'components/error-fallbacks'
 import pfp from 'assets/img/navbar/pfp.png'
 import {Home} from 'screens/home'
-import {Artist} from 'screens/artist'
+import {Playlist} from 'screens/playlist'
 import {Search} from 'screens/search'
-import {Playlists} from 'screens/playlists'
+import {Album} from 'screens/album'
+import {YourLibrary} from 'screens/your-library'
 import {NotFoundScreen} from 'screens/not-found'
 import {useLocalStorageState} from 'utils/hooks'
 import {useAccessToken, useAccessTokenWithLocalStorage} from 'context/auth-context'
@@ -23,6 +24,8 @@ import SpotifyWebApi from 'spotify-web-api-node'
 import {Player} from 'components/player'
 import {LOCALSTORAGE_KEYS} from 'auth-provider'
 import {useSpotifyData} from 'utils/hooks'
+// import {useUserData} from 'context/user-data-context'
+// import {useUserData} from 'utils/user-data'
 
 // If we have an error
 function ErrorFallback({error}) {
@@ -48,11 +51,10 @@ function AuthenticatedApp() {
   
   const getAccessToken = localStorageAccessToken ? localStorageAccessToken : getToken
   const [, setAccessToken] = useAccessToken()
-
+  
   // 
   React.useEffect(() => {
     if (!getAccessToken) return
-
     // 👩‍🏫 We use this awesome API in the entire app: `https://github.com/thelinmichael/spotify-web-api-node`
     spotifyApi.setAccessToken(getAccessToken)
     setAccessToken(getAccessToken)
@@ -132,20 +134,36 @@ function NavLink(props) {
   )
 }
 
+const fallbackUserData = {
+  body: {
+    "display_name": "Loading...",
+    "email": "Loading...",
+    "id": "Loading...",
+    "images": [
+      {
+        "url": 'fallbackSpotify'
+      }
+    ],
+    // we can recognize here either the user is `premium` or not
+    "product": "loading...",
+  }
+}
+
 function Nav() {
   const [accessToken] = useAccessToken()
   const spotifyWebApi = useSpotifyWebAPI()
 
+  // const value = useUserData()
+
   const {status, data, error, run, isLoading, isSuccess} = useSpotifyData({
     status: 'pending',
   })
-
+  
   React.useEffect(() => {
     if (!accessToken) return
     
     run(spotifyWebApi.getMe())
   }, [accessToken, run])
-
 
   return (
     <NavBar className={css`
@@ -157,6 +175,8 @@ function Nav() {
         display: flex;
         align-items: center;
       `}>
+        {/* {value.body.display_name} */}
+        <br />
         {isLoading ? (
           <>
             <NavPfp src={pfp} />
@@ -166,7 +186,9 @@ function Nav() {
           <>
             {/* <NavPfp src={data.body.images[0].url} /> */}
             <NavPfp src={pfp} />
-            <NavName>{data.body.display_name}</NavName>
+            <NavName>
+              {data.body.display_name}
+            </NavName>
           </>
         ) : null}
       </div>
@@ -191,19 +213,23 @@ function Nav() {
           </NavLink>
         </li>
         <li>
-          <NavLink to="/playlists">
+          <NavLink to="/your-library">
             <PlaylistIcon />
-            <MenuItem>Playlists</MenuItem>
+            <MenuItem>Your Library</MenuItem>
           </NavLink>
         </li>
       </ul>
-      <a 
+      <a
         css={{
-          marginTop: '30px',
+          marginTop: '45px',
           color: '#fff',
           display: 'block',
-          cursor: 'pointer'
-        }} 
+          cursor: 'pointer',
+          textTransform: 'uppercase',
+          textDecoration: 'underline',
+          fontWeight: 'bold',
+          marginTop: '45px'
+        }}
         onClick={auth.logout}
       >logout</a>
     </NavBar>
@@ -214,9 +240,11 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Home />} />
-      <Route path="/playlists" element={<Playlists />} />
+      <Route path="/your-library" element={<YourLibrary />} />
       <Route path="/search" element={<Search />} />
-      <Route path="/artist/:id" element={<Artist />} />
+      <Route path="/playlist/:id" element={<Playlist />} />
+      <Route path="/album/:id" element={<Album />} />
+      <Route path="/your-library/" element={<YourLibrary />} />
       <Route path="*" element={<NotFoundScreen />} />
     </Routes>
   )

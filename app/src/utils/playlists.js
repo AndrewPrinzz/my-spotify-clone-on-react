@@ -42,7 +42,7 @@ function SpotifyPlaylistDataView({data}) {
       <PlayListItem
         key={index}
       >
-        <Link to={`/artist/${id}`}>
+        <Link to={`/playlist/${id}`}>
           <PlaylistImage
             color={colors.blue}
             cover={images[0].url}

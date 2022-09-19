@@ -1,3 +1,6 @@
+/** @jsxImportSource @emotion/react */
+import {jsx} from '@emotion/react'
+
 import React from 'react'
 
 import {
@@ -56,7 +59,7 @@ function SpotifySearchQueryInfo({searchQuery}) {
       return
     }
     else if (cache[searchQuery]) {
-      console.log('cache: ', cache);
+
       setData(cache[searchQuery])
     }
     else {
@@ -66,7 +69,7 @@ function SpotifySearchQueryInfo({searchQuery}) {
         })
           .then(searchQueryData => {
             // for caching purposese
-            dispatch({ type: 'ADD_QUERY', searchQuery, searchQueryData })
+            dispatch({type: 'ADD_QUERY', searchQuery, searchQueryData})
             return searchQueryData
           })
       )

@@ -32,7 +32,7 @@ function clearAuthData() {
 
 function useGetToken() {
   const code = new URLSearchParams(window.location.search).get('code')
-
+  
   const [accessToken, setAccessToken] = useAccessToken()
   const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
   const [refreshToken, setRefreshToken] = useRefreshToken()
@@ -42,26 +42,40 @@ function useGetToken() {
   const [timeStamp, setTimestamp] = useTimeStamp()
   const [localStorageTimeStamp, setLocalStorageTimeStamp] = useLocalStorageState(LOCALSTORAGE_KEYS.timeStamp)
   
+  const setAuthData = (res) => {
+    
+    // if we don't have res.data then we set value from local storage
+    setAccessToken(res?.data?.accessToken)
+    setLocalStorageAccessToken(res?.data?.accessToken)
+
+
+    if (res.data.refreshToken) {
+      setRefreshToken(res?.data?.refreshToken)
+      setLocalStorageRefreshToken(res?.data?.refreshToken)
+    }
+
+    setExpiresIn(res?.data?.expiresIn)
+    setlocalStorageExpiresIn(res?.data?.expiresIn)
+
+    // if we just set this value then we should add it to local storage
+    setTimestamp(Date.now())
+    setLocalStorageTimeStamp(Date.now())
+  }
 
   React.useEffect(() => {
-    // if we have access token in our localStorage then we do nothing
+    // if we have the user's token in local storage we set it for refreshing the refresh token
+    if (localStorageRefreshToken && localStorageExpiresIn) {
+      setRefreshToken(localStorageRefreshToken)
+      setExpiresIn(localStorageExpiresIn)
+      setTimestamp(localStorageTimeStamp)
+      setAccessToken(localStorageAccessToken)
+    }
     if (!code) return
 
     axios.post(`${process.env.REACT_APP_URL}/login`, {
       code: code
     }).then(res => {
-      setAccessToken(res.data.accessToken)
-      setLocalStorageAccessToken(res.data.accessToken)
-
-      setRefreshToken(res.data.refreshToken)
-      setLocalStorageRefreshToken(res.data.refreshToken)
-
-      setExpiresIn(res.data.expiresIn)
-      setlocalStorageExpiresIn(res.data.expiresIn)
-
-      setTimestamp(Date.now())
-      setLocalStorageTimeStamp(Date.now())
-
+      setAuthData(res)
       window.history.pushState({}, null, '/')
     }).catch((err) => {
       console.log('err 1: ', err);
@@ -70,29 +84,26 @@ function useGetToken() {
   }, [code])
 
   React.useEffect(() => {
-    if (!refreshToken || !expiresIn) return
+    // if we have values in local storage we should set it back
+    if (!refreshToken || !expiresIn || !timeStamp) return
     const interval = setInterval(() => {
       axios.post(`${process.env.REACT_APP_URL}/refresh`, {
         refreshToken
       }).then(res => {
-        setAccessToken(res.data.accessToken)
-        setLocalStorageAccessToken(res.data.accessToken)
-
-        setRefreshToken(res.data.refreshToken)
-        setLocalStorageRefreshToken(res.data.refreshToken)
-
-        setExpiresIn(res.data.expiresIn)
-        setlocalStorageExpiresIn(res.data.expiresIn)
-
-        setTimestamp(Date.now())
-        setLocalStorageTimeStamp(Date.now())
+        console.log('res refresh token: ', res);
+        setAuthData(res)
       }).catch((err) => {
         console.log('err 2: ', err);
         window.location = '/'
       })
       // calc time the token will expire (spoiler: it's 3600ms)
-    }, (expiresIn - 60) * 1000);
-
+    }, 
+      // we’re essentially gonna refresh one minute before it expires
+      timeStamp + (expiresIn * 1000 - 3600) - Date.now()
+      )
+      if (timeStamp && expiresIn) {
+        console.log('(expiresIn - 60) * 1000): ', timeStamp + (expiresIn * 1000 - 3600) - Date.now());   
+      }
     return () => clearInterval(interval)
   }, [refreshToken, expiresIn])
 

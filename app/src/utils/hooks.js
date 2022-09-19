@@ -180,7 +180,6 @@ function useSpotifyData(initialState) {
       safeSetState({status: 'pending'})
       return promise.then(
         data => {
-          console.log('data logout: ', data);
           // we do that to be able to set delay shotrly 
           const returnData = () => {setData(data); return data}
           // setting delay for testing purposes

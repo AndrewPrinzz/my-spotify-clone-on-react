@@ -18,7 +18,7 @@ import ControllProps from 'components/polygon/advanced-react-patterns/controll-p
 injectGlobal`
   body {
     background: #180c1a;
-    padding-bottom: 200px;
+    /* padding-bottom: 200px; */
   }
 `
 

@@ -38,10 +38,10 @@ const loadingTracks = (length) => Array.from({length: length}, (v, index) => ({
   ...loadingTrack
 }))
 
-function SpotifyTrackInfoFallback({limit, length = 10}) {
+function SpotifyTrackInfoFallback({limit = 10}) {
   
   return (
-    <SpotifyTrackDataView data={loadingTracks(length)} />
+    <SpotifyTrackDataView data={loadingTracks(limit)} />
   )
 }
 
@@ -50,8 +50,7 @@ function SpotifyTrackDataView({data}) {
   const [, setOffset] = useOffset() 
 
   function chooseTrack(track, index) {
-    console.log('track: ', track);
-    console.log('index: ', index);
+    
     // we don't have a uri if we're loading so we have to do nothing
     if (!track) return
     // setting all the track uris we have now to player
@@ -69,6 +68,12 @@ function SpotifyTrackDataView({data}) {
     setOffset(index)
   }
 
+  const getArtists = (artists) => {
+    return artists.reduce((prev, next, i) =>
+      prev + (i >= 1 ? ', ' : '') + next.name
+    , [])
+  }
+
   return (
     data.map(({id, album, name, uri}, index) =>
       <Track key={id}>
@@ -76,8 +81,8 @@ function SpotifyTrackDataView({data}) {
           <img src={album.images[0].url} />
         </TrackImage>
         <TrackInfo>
-          <TrackAuthor>{album.artists[0].name}</TrackAuthor>
-          <TrackName>{name}</TrackName>
+          <TrackAuthor>{name}</TrackAuthor>
+          <TrackName>{getArtists(album.artists)}</TrackName>
         </TrackInfo>
       </Track>
     )

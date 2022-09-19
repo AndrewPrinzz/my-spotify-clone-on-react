@@ -31,10 +31,6 @@ function useAccessToken(value) {
   return context
 }
 
-function useAccessFakeToken(params) {
-  const [accessToken, setAccessToken] = useAccessToken()
-}
-
 const RefreshTokenContext = React.createContext()
 RefreshTokenContext.displayName = 'RefreshTokenContext'
 

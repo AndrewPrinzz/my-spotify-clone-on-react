@@ -7,6 +7,7 @@ import AuthenticatedApp from './authenticated-app'
 import UnauthenticatedApp from './unauthenticated-app'
 import {useLocalStorageState} from 'utils/hooks'
 import * as auth from 'auth-provider'
+import {UserDataProvider} from 'context/user-data-context'
 
 
 const code = new URLSearchParams(window.location.search).get('code')
@@ -16,17 +17,19 @@ function AppProviders({children}) {
     <CodeProvider>
       <SpotifyWebAPIProvider>
         <AccessTokenProvider>
-          <PlayerProvider>
-            <OffsetProvider>
-              <ExpiresInProvider>
-                <RefreshTokenProvider>
-                  <TimeStampProvider>
-                    {children}
-                  </TimeStampProvider>
-                </RefreshTokenProvider>
-              </ExpiresInProvider>
-            </OffsetProvider>
-          </PlayerProvider>
+          <UserDataProvider>
+            <PlayerProvider>
+              <OffsetProvider>
+                <ExpiresInProvider>
+                  <RefreshTokenProvider>
+                    <TimeStampProvider>
+                      {children}
+                    </TimeStampProvider>
+                  </RefreshTokenProvider>
+                </ExpiresInProvider>
+              </OffsetProvider>
+            </PlayerProvider>
+          </UserDataProvider>
         </AccessTokenProvider>
       </SpotifyWebAPIProvider>
     </CodeProvider>

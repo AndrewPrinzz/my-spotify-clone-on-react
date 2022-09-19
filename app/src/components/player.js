@@ -16,14 +16,14 @@ function Player() {
 
 
   React.useEffect(() => {
-    console.log('something changed');
+    // console.log('something changed');
     setPlay(true)
   }, [player])
 
   function handleCallback(state) {
     console.log('state: ', state);
     if (!state.isPlaying) setPlay(false)
-    console.log('something changed');
+    // console.log('something changed');
   }
 
   if (!accessToken) return null

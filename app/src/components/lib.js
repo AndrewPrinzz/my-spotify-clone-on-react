@@ -1,5 +1,6 @@
 import { css, injectGlobal } from '@emotion/css'
 import * as colors from 'styles/colors'
+import * as sizes from 'styles/sizes'
 import 'styles/fonts'
 import navbgc from 'assets/img/navbar/navbar-small.png'
 import bgclogin from 'assets/img/background-login.jpg'
@@ -35,7 +36,8 @@ export const NavBar = styled.nav`
   background-image: url(${navbgc});
   background-repeat: no-repeat;
   background-size: cover;
-  width: 421px;
+  max-width: 421px;
+  min-width: 421px;
   padding: 80px;
 `
 
@@ -125,7 +127,7 @@ export const Browse = styled.div`
   flex-direction: column;
   margin-top: 78px;
   margin-left: 112px;
-  width: 1167px;
+  width: ${sizes.container};
   padding-bottom: 300px;
 `
 
@@ -170,7 +172,8 @@ export const PlayListItems = styled.div`
 export const PlayListItem = styled.div`
   display: flex;
   justify-content: space-between;
-  width: 365px;
+  min-width: 365px;
+  max-width: 365px;
   flex-direction: column;
 `
 
@@ -179,8 +182,10 @@ export const PlaylistImage = styled.div`
   flex-direction: column;
   margin-top: 38px;
   position: relative;
-  width: 365px;
-  height: 365px;
+  min-width: 365px;
+  max-width: 365px;
+  max-height: 365px;
+  min-height: 365px;
   border-radius: 12px;
   background-repeat: no-repeat;
   background-size: cover;
@@ -275,12 +280,12 @@ export const InterfaceDspr = styled.div`
   font-weight: bold;
 `
 
-export const RecommendedBlocks = styled.div`
+export const SimilarBlocks = styled.div`
   display: flex;
   justify-content: space-between;
 `
 
-export const RecommendedBlock = styled.div`
+export const SimilarBlock = styled.div`
   width: 45%;
   /* margin-left: 27px; */
   `
@@ -339,7 +344,12 @@ export const TrackAuthor = styled.div`
   font-size: 20px;
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: ${colors.base}
+  color: ${colors.base};
+  max-width: 430px;
+  text-shadow: 0px 4px 4px rgb(0 0 0 / 25%);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
 `
 
 export const TrackName = styled.div`
@@ -400,4 +410,97 @@ export const MusicResults = styled.div`
 
 export const SpotifyWebPlayerStyled = styled(SpotifyWebPlayer)`
   background: transparent!important;
+`
+
+export const PlaylistCover = styled.div`
+  display: flex;
+  align-items: end;
+  padding: 78px 112px;
+  background: linear-gradient(256.42deg, #212E4C 40.27%, rgba(33, 46, 76, 0.13) 96.22%, rgba(33, 46, 76, 0.63) 100%);
+  width: 100%;
+`
+
+export const PlaylistScreen = styled.div`
+  width: 100%;
+`
+
+export const PlaylistAlbumTotalTracks = styled.div`
+  margin-top: 13px;
+  font-weight: 300;
+  font-size: 21px;
+  line-height: 26px;
+  letter-spacing: 0.02em;
+  color: ${colors.base};
+`
+
+export const PlaylistAlbumArtist = styled.div`
+  margin-top: 6px;
+  font-weight: 700;
+  font-size: 26px;
+  line-height: 32px;
+  letter-spacing: 0.02em;
+  color: ${colors.base};
+`
+
+export const PlaylistAlbumName = styled.div`
+  margin-top: 9px;
+  font-weight: 700;
+  font-size: 52px;
+  line-height: 63px;
+  letter-spacing: 0.02em;
+  color: ${colors.base};
+`
+
+export const PlaylistAlbumText = styled.div`
+  margin-top: 32px;
+  font-weight: 700;
+  font-size: 21px;
+  line-height: 26px;
+  letter-spacing: 0.02em;
+  color: ${colors.base};
+`
+
+export const PlaylistImageCover = styled(PlaylistImage)`
+  margin-right: 45px;
+`
+
+export const PlaylistBrowseBlockTracks = styled.div`
+  min-width: 50%;
+  max-width: 50%;
+`
+
+export const PlaylistBrowseBlockSimilarAlbums = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+`
+
+export const PlaylistBrowseBlockSimilarAlbumsContent = styled.div`
+  display: flex;
+  flex-wrap: wrap
+`
+
+export const PlaylistContainer = styled.div`
+  width: ${sizes.container};
+  display: flex;
+  align-items: flex-start;
+  margin-top: 35px;
+  margin-left: 112px;
+  width: ${sizes.container};
+  padding-bottom: 300px;
+`
+
+export const PlaylistAlbumDescription = styled.div`
+  margin-top: 6px;
+  font-weight: 300;
+  font-size: 18px;
+  line-height: 32px;
+  letter-spacing: 0.02em;
+  color: white;
+`
+
+export const SimilarPlaylist = styled(PlaylistImageCover)`
+  max-width: 200px;
+  min-width: 200px;
+  max-height: 200px;
+  min-height: 200px;
 `

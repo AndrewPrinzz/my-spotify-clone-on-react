@@ -55,6 +55,7 @@ function useAsync(initialState) {
   const run = React.useCallback(
     promise => {
       if (!promise || !promise.then) {
+        console.log('promise: ', promise);
         throw new Error(
           `The argument passed to useAsync().run must be a promise. Maybe a function that's passed isn't returning anything?`,
         )

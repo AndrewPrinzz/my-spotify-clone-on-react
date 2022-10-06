@@ -8,31 +8,39 @@ import UnauthenticatedApp from './unauthenticated-app'
 import {useLocalStorageState} from 'utils/hooks'
 import * as auth from 'auth-provider'
 import {UserDataProvider} from 'context/user-data-context'
-
+import {QueryClient, QueryClientProvider} from 'react-query'
+import {SearchQueryProvider} from 'context/search-query-context'
 
 const code = new URLSearchParams(window.location.search).get('code')
+const queryClient = new QueryClient()
 
 function AppProviders({children}) {
   return (
-    <CodeProvider>
-      <SpotifyWebAPIProvider>
-        <AccessTokenProvider>
-          <UserDataProvider>
-            <PlayerProvider>
-              <OffsetProvider>
-                <ExpiresInProvider>
-                  <RefreshTokenProvider>
-                    <TimeStampProvider>
-                      {children}
-                    </TimeStampProvider>
-                  </RefreshTokenProvider>
-                </ExpiresInProvider>
-              </OffsetProvider>
-            </PlayerProvider>
-          </UserDataProvider>
-        </AccessTokenProvider>
-      </SpotifyWebAPIProvider>
-    </CodeProvider>
+    <>
+      <QueryClientProvider client={queryClient}>
+        <CodeProvider>
+          <SearchQueryProvider>
+            <SpotifyWebAPIProvider>
+              <AccessTokenProvider>
+                <UserDataProvider>
+                  <PlayerProvider>
+                    <OffsetProvider>
+                      <ExpiresInProvider>
+                        <RefreshTokenProvider>
+                          <TimeStampProvider>
+                            {children}
+                          </TimeStampProvider>
+                        </RefreshTokenProvider>
+                      </ExpiresInProvider>
+                    </OffsetProvider>
+                  </PlayerProvider>
+                </UserDataProvider>
+              </AccessTokenProvider>
+            </SpotifyWebAPIProvider>
+          </SearchQueryProvider>
+        </CodeProvider>
+      </QueryClientProvider>
+    </>
   )
 }
 

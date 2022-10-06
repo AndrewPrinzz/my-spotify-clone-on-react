@@ -1,7 +1,8 @@
 import React from 'react'
+import {useQuery} from 'react-query'
+import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
-import {TrackImage, TrackAuthor, TrackInfo, TrackName, Track} from 'components/lib'
-import {usePlayer, useOffset} from 'context/player-context'
+import {useQueryClient} from 'react-query'
 
 const loadingTrack = {
   album: {
@@ -33,64 +34,76 @@ const loadingTrack = {
 }
 
 // specify preview of loading tracks
-const loadingTracks = (length) => Array.from({length: length}, (v, index) => ({
+const loadingTracks = (length) => Array.from({ length: length }, (v, index) => ({
   id: `loading-track-${index}`,
   ...loadingTrack
 }))
 
-function SpotifyTrackInfoFallback({limit = 10}) {
+function useTracksSearch(query) {
+  const spotifyApi = useSpotifyWebAPI()
   
-  return (
-    <SpotifyTrackDataView data={loadingTracks(limit)} />
-  )
+  // {data: searchData, isIdle, isLoading, isSuccess, isLoadingError}
+
+  // And we’ll get all of the same stuff except for run. Because useQuery is gonna manage that for us
+    const result = useQuery({
+      // 1 - unique identifier 2 - uniqly identify this query 
+      queryKey: ['trackSearch', {query}],
+      // query function is what I'm pussing to run rn
+      queryFn: () => spotifyApi.searchTracks(query, {
+        limit: 15
+      }),
+      // we don't enable fetching data till we have a search query
+      enabled: query ? true : false
+    })
+    // we don't need useEffect anymore so we got rid of it. React query does it instead 
+
+    return {...result, tracks: result.data ?? loadingTrack}
 }
 
-function SpotifyTrackDataView({data}) {
-  const [, setPlayer] = usePlayer()
-  const [, setOffset] = useOffset() 
+function useSavedTracks() {
+  const spotifyWebApi = useSpotifyWebAPI()
 
-  function chooseTrack(track, index) {
-    
-    // we don't have a uri if we're loading so we have to do nothing
-    if (!track) return
-    // setting all the track uris we have now to player
+  const result = useQuery({
+    queryKey: 'your-album',
+    queryFn: () => spotifyWebApi.getMySavedTracks({limit: 50})
+  })
 
-    
-    setPlayer(
-      data.reduce(
-        (prevValue, currentValue) =>
-          prevValue.concat(currentValue.uri),
-        []
-      )
-      // track
-    )
-    // set track offset
-    setOffset(index)
-  }
+  return {...result, tracks: result.data}
+}
 
-  const getArtists = (artists) => {
-    return artists.reduce((prev, next, i) =>
-      prev + (i >= 1 ? ', ' : '') + next.name
-    , [])
-  }
+function useRecommendedTracks() {
+  const spotifyApi = useSpotifyWebAPI()
+  const queryClient = useQueryClient()
 
-  return (
-    data.map(({id, album, name, uri}, index) =>
-      <Track key={id}>
-        <TrackImage onClick={() => chooseTrack(uri, index)}>
-          <img src={album.images[0].url} />
-        </TrackImage>
-        <TrackInfo>
-          <TrackAuthor>{name}</TrackAuthor>
-          <TrackName>{getArtists(album.artists)}</TrackName>
-        </TrackInfo>
-      </Track>
-    )
-  )
+  // getting our seeds
+  const {data: seedsData, status: seedsStatus} = useQuery({
+    queryKey: 'seeds-data',
+    queryFn: () => spotifyApi.getMyTopTracks({ limit: 2 })
+  })
+
+  const result = useQuery({
+    queryKey: 'recommended-tracks',
+    queryFn: () => {
+      return spotifyApi.getRecommendations({
+        min_energy: 0.4,
+        // reduce the data to seeds that we need
+        seed_tracks: seedsData.body.items.reduce(
+          (prevValue, currentValue) =>
+            prevValue.concat(currentValue.id),
+          []
+        ),
+        min_popularity: 50,
+        limit: 10
+      })
+    },
+    enabled: queryClient.getQueriesData(['recommended-tracks'])[0]?.[1] ? false : seedsStatus !== 'success' ? false : true
+  })
+
+  return {...result, recommendedTracks: result.data}
 }
 
 export {
-  SpotifyTrackInfoFallback,
-  SpotifyTrackDataView,
-  loadingTracks
+  useTracksSearch,
+  useSavedTracks,
+  useRecommendedTracks
 }

@@ -28,7 +28,7 @@ function SpotifyPlaylistInfoFallback({data}) {
   }
 
   // get limit to make an object
-  const {limit} = data
+  const {limit} = data || 3
   // making an array for filling data
   const setData = Array(limit).fill(fallbackSpotifyData)
 
@@ -38,11 +38,11 @@ function SpotifyPlaylistInfoFallback({data}) {
 function SpotifyPlaylistDataView({data}) {
   
   return (
-    data.map(({images, tracks, id, name}, index) =>
+    data.map(({images, album_type, type, tracks, id, name}, index) =>
       <PlayListItem
         key={index}
       >
-        <Link to={`/playlist/${id}`}>
+        <Link to={`/${type || album_type}/${id}`}>
           <PlaylistImage
             color={colors.blue}
             cover={images[0].url}
@@ -120,7 +120,7 @@ function SearchForm({
 }) {
 
   const [searchQuery, setSearchQuery] = React.useState(initialSearchQuery)
-
+  
   // this is generally not a great idea. We're synchronizing state when it is
   // normally better to derive it https://kentcdodds.com/blog/dont-sync-state-derive-it
   // however, we're doing things this way to make it easier for the exercises

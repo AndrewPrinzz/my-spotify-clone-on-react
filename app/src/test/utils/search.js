@@ -6,7 +6,7 @@ import React from 'react'
 import {
   SpotifySearchTracksDataView,
   SearchQueryErrorBoundary,
-} from 'utils/playlists'
+} from 'components/playlists'
 
 import {Player} from 'components/player'
 import {useSpotifyData} from 'utils/hooks'
@@ -18,9 +18,10 @@ import {useAccessToken} from 'context/auth-context'
 import {
   SpotifyTrackInfoFallback,
   SpotifyTrackDataView
-} from 'utils/tracks'
+} from 'components/tracks'
+import { useQuery } from 'react-query'
 
-function PreviousQuery({ onSelect }) {
+function PreviousQuery({onSelect}) {
   const cache = useQueryDataCache()
 
   return (
@@ -49,9 +50,8 @@ function SpotifySearchQueryInfo({searchQuery}) {
   // caching data for a better user expirience
   const [cache, dispatch] = useQueryDataCache()
 
-  const {status, data: searchData, setData, error, run: client} = useSpotifyData({
+  const {status, data: searchData, setData, error, run} = useSpotifyData({
     status: searchQuery ? 'pending' : 'idle',
-    delay: false
   })
 
   React.useEffect(() => {
@@ -63,7 +63,7 @@ function SpotifySearchQueryInfo({searchQuery}) {
       setData(cache[searchQuery])
     }
     else {
-      client(
+      run(
         spotifyApi.searchTracks(searchQuery, {
           limit: 15
         })
@@ -75,7 +75,7 @@ function SpotifySearchQueryInfo({searchQuery}) {
       )
 
     }
-  }, [searchQuery, client])
+  }, [searchQuery, run])
 
   // write a component for handling player data because it doesn't render so there's always an error
   if (status === 'idle') {

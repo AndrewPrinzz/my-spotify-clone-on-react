@@ -221,35 +221,7 @@ function useSpotifyData(initialState) {
   }
 }
 
-function useGetUsersSeeds() {
-  const [accessToken] = useAccessToken()
-  console.log('accessToken: ', accessToken);
-  const spotifyApi = useSpotifyWebAPI()
-
-  const {data, status, error, run, isSuccess, isLoading} = useSpotifyData({
-    status: 'pending',
-  })
-
-  React.useEffect(() => {
-    if (!accessToken) return
-
-    run(spotifyApi.getMyTopTracks({limit: 5}))
-  }, [run])
-
-  if (status === 'resolved') {
-    // get user's seeds to get recommendations after
-    const data = data.body.items.reduce(
-      (prevValue, currentValue) =>
-      prevValue.concat(currentValue.album.artists[0].id),
-      []
-    )
-    return data 
-  }
-}
-
 export {
-  // useAuth,
   useLocalStorageState, 
   useSpotifyData,
-  useGetUsersSeeds
 }

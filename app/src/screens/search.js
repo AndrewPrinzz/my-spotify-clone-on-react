@@ -1,35 +1,61 @@
+/** @jsxImportSource @emotion/react */
+import { jsx } from '@emotion/react'
+
 import React from 'react'
 
 import {
-  SpotifyPlaylistInfoFallback,
-  SpotifyPlaylistDataView,
-  SpotifySearchTracksDataView,
-  SearchQueryErrorBoundary,
   SearchForm
-} from 'utils/playlists'
+} from 'components/playlists'
 import {Browse} from 'components/lib'
-import {QuerySection} from 'utils/search'
+
+import {
+  SpotifyTrackInfoFallback,
+  SpotifyTrackDataView
+} from 'components/tracks'
+import {useSearchQuery} from 'context/search-query-context'
+import {useTracksSearch} from 'utils/tracks'
+import * as colors from 'styles/colors'
 
 function Search() {
-  const [searchQuery, setSearchQuery] = React.useState('')
+  const [query, setQuery] = useSearchQuery()
 
+  const {tracks, isIdle, isLoading, isSuccess, isError} = useTracksSearch(query)
+  
   function handleChange(e) {
-    setSearchQuery(e.target.value)
+    setQuery(e.target.value)
   }
 
-  function handleSubmit(newSearchQuery) {
-    setSearchQuery(newSearchQuery)
+  function handleSubmit(query) {
+    setQuery(query)
   }
 
   function handleReset() {
-    setSearchQuery('')
+    setQuery('')
   }
 
   return (
     <Browse>
-      <SearchForm searchQuery={searchQuery} onSubmit={handleSubmit} onChange={handleChange} />
+      <SearchForm searchQuery={query} onSubmit={handleSubmit} onChange={handleChange} />
       <hr />
-      <QuerySection searchQuery={searchQuery} />
+      {isError ? (
+        <div css={{color: colors.danger}}>
+          Sorry, there was an error. Try refreshing the page or log in again.
+        </div>
+      ) : null}
+      
+      {isIdle || !query.length ? (
+        <span>
+          Search tracks
+        </span>
+      ) : isLoading ? (
+        <SpotifyTrackInfoFallback limit={15} />
+      ) : isSuccess && tracks.body.tracks.items ? (
+        <SpotifyTrackDataView data={tracks.body.tracks.items} />
+      ) : isSuccess && !tracks.body.tracks.items ? (
+        <span>
+          Hmmm... I coudln't find any tracks to suggest for you. Sorry.
+        </span>
+      ) : null}
     </Browse>
   )
 }

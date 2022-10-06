@@ -7,7 +7,7 @@ import * as colors from 'styles/colors'
 import {BrowserRouter as Router, Link as RouterLink, Routes, Route, useMatch } from 'react-router-dom'
 import {ErrorBoundary} from 'react-error-boundary'
 import {NavBar, NavName, NavPfp, MenuItem } from './components/lib'
-import {Home as HomeIcon, Note as NoteIcon, Playlists as PlaylistIcon } from 'components/icons'
+import {Home as HomeIcon, Note as NoteIcon, Playlists as PlaylistIcon, Albums as AlbumIcon} from 'components/icons'
 import {ErrorMessage, FullPageErrorFallback} from 'components/error-fallbacks'
 import pfp from 'assets/img/navbar/pfp.png'
 import {Home} from 'screens/home'
@@ -15,6 +15,7 @@ import {Playlist} from 'screens/playlist'
 import {Search} from 'screens/search'
 import {Album} from 'screens/album'
 import {YourLibrary} from 'screens/your-library'
+import {YourAlbums} from 'screens/your-albums'
 import {NotFoundScreen} from 'screens/not-found'
 import {useLocalStorageState} from 'utils/hooks'
 import {useAccessToken, useAccessTokenWithLocalStorage} from 'context/auth-context'
@@ -26,6 +27,7 @@ import {LOCALSTORAGE_KEYS} from 'auth-provider'
 import {useSpotifyData} from 'utils/hooks'
 // import {useUserData} from 'context/user-data-context'
 // import {useUserData} from 'utils/user-data'
+import {useQuery, useQueryClient} from 'react-query'
 
 // If we have an error
 function ErrorFallback({error}) {
@@ -43,14 +45,14 @@ function ErrorFallback({error}) {
   )
 }
 
-function AuthenticatedApp() {
+function AuthenticatedApp({logout}) {
   const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
   
   const spotifyApi = useSpotifyWebAPI()
   const getToken = auth.getToken()
   
   const getAccessToken = localStorageAccessToken ? localStorageAccessToken : getToken
-  const [, setAccessToken] = useAccessToken()
+  const [accessToken, setAccessToken] = useAccessToken()
   
   // 
   React.useEffect(() => {
@@ -63,29 +65,29 @@ function AuthenticatedApp() {
   }, [getAccessToken])
 
   return (
-    // Error boundary provider
-    <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
-      <Router>
-        <div className={css`
-          background: linear-gradient(101.32deg, #292929 1.55%, #1E1322 90.79%);
-          display: flex;
-        `}>
-          <Nav />
-          {/* If we have an error we show an error we've written above */}
-          <ErrorBoundary FallbackComponent={ErrorFallback}>
-            <AppRoutes />
-          </ErrorBoundary>
-          <div css={{
-            position: 'fixed',
-            bottom: '0',
-            width: '100%',
-            background: '#000'
-          }}>
-            <Player />
+      // Error boundary provider
+      <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
+        <Router>
+          <div className={css`
+            background: linear-gradient(101.32deg, #292929 1.55%, #1E1322 90.79%);
+            display: flex;
+          `}>
+            <Nav logout={logout} />
+            {/* If we have an error we show an error we've written above */}
+            <ErrorBoundary FallbackComponent={ErrorFallback}>
+              <AppRoutes />
+            </ErrorBoundary>
+            <div css={{
+              position: 'fixed',
+              bottom: '0',
+              width: '100%',
+              background: '#000'
+            }}>
+              <Player />
+            </div>
           </div>
-        </div>
-      </Router>
-    </ErrorBoundary>
+        </Router>
+      </ErrorBoundary>
   )
 }
 
@@ -152,8 +154,9 @@ const fallbackUserData = {
 function Nav() {
   const [accessToken] = useAccessToken()
   const spotifyWebApi = useSpotifyWebAPI()
+  const queryClient = useQueryClient()
 
-  // const value = useUserData()
+  const logout = auth.logout
 
   const {status, data, error, run, isLoading, isSuccess} = useSpotifyData({
     status: 'pending',
@@ -218,6 +221,12 @@ function Nav() {
             <MenuItem>Your Library</MenuItem>
           </NavLink>
         </li>
+        <li>
+          <NavLink to="/your-albums">
+            <AlbumIcon />
+            <MenuItem>Your Albums</MenuItem>
+          </NavLink>
+        </li>
       </ul>
       <a
         css={{
@@ -230,7 +239,7 @@ function Nav() {
           fontWeight: 'bold',
           marginTop: '45px'
         }}
-        onClick={auth.logout}
+        onClick={logout}
       >logout</a>
     </NavBar>
   )
@@ -245,6 +254,7 @@ function AppRoutes() {
       <Route path="/playlist/:id" element={<Playlist />} />
       <Route path="/album/:id" element={<Album />} />
       <Route path="/your-library/" element={<YourLibrary />} />
+      <Route path="/your-albums/" element={<YourAlbums />} />
       <Route path="*" element={<NotFoundScreen />} />
     </Routes>
   )

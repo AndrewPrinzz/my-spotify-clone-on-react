@@ -3,7 +3,7 @@ import { css } from '@emotion/css'
 import { Menu, MenuIcon } from 'components/lib'
 import * as colors from 'styles/colors'
 
-const Home = ({ fill = `${colors.gray}` }) => {
+const Home = ({fill = `${colors.gray}`}) => {
   return (   
     <MenuIcon> 
       <svg width="30" height="27" viewBox="0 0 30 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -13,7 +13,7 @@ const Home = ({ fill = `${colors.gray}` }) => {
   )
 }
 
-const Note = ({ fill = `${colors.gray}` }) => {
+const Note = ({fill = `${colors.gray}`}) => {
   return (
     <MenuIcon>
       <svg width="18" height="29" viewBox="0 0 18 29" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -26,7 +26,7 @@ const Note = ({ fill = `${colors.gray}` }) => {
   )
 }
 
-const Playlists = ({ fill = `${colors.gray}` }) => {
+const Playlists = ({fill = `${colors.gray}`}) => {
   return (
     <MenuIcon>
       <svg width="27" height="27" viewBox="0 0 27 27" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -36,7 +36,7 @@ const Playlists = ({ fill = `${colors.gray}` }) => {
   )
 }
 
-const Play = ({ fill = `${colors.gray}` }) => {
+const Play = ({fill = `${colors.gray}`}) => {
   return (
     <MenuIcon>
       <svg width="50" height="50" viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -54,4 +54,25 @@ const Play = ({ fill = `${colors.gray}` }) => {
   )
 }
 
-export { Home, Note, Playlists, Play }
+const Albums = ({fill = `${colors.gray}`}) => {
+  return (
+    <MenuIcon>
+      <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+        <g data-name="Layer 37" id="Layer_37">
+          <path fill={fill} d="M24,27H2a1,1,0,0,1-1-1V2A1,1,0,0,1,2,1H24a1,1,0,0,1,1,1V26A1,1,0,0,1,24,27ZM3,25H23V3H3Z"/>
+            <path fill={fill} d="M30,31H8a1,1,0,0,1,0-2H29V7H28a1,1,0,0,1,0-2h2a1,1,0,0,1,1,1V30A1,1,0,0,1,30,31Z"/>
+            <path fill={fill} d="M2,21.86a1,1,0,0,1-.7-.29,1,1,0,0,1,0-1.41L5.35,16a2.67,2.67,0,0,1,3.48-.29l3.59,2.6a.68.68,0,0,0,.88-.08L17,14.51a2.75,2.75,0,0,1,3.82,0l3.88,3.93a1,1,0,0,1-1.42,1.4l-3.88-3.93a.69.69,0,0,0-1,0l-3.71,3.75a2.68,2.68,0,0,1-3.48.3l-3.59-2.6a.67.67,0,0,0-.88.07L2.71,21.56A1,1,0,0,1,2,21.86Z"/>
+            <path fill={fill} d="M13.85,12.86a4,4,0,1,1,4-4A4,4,0,0,1,13.85,12.86Zm0-6a2,2,0,1,0,2,2A2,2,0,0,0,13.85,6.86Z"/>
+          </g>
+      </svg>
+    </MenuIcon>
+  )
+}
+
+export {
+  Home,
+  Note,
+  Playlists,
+  Play,
+  Albums
+}

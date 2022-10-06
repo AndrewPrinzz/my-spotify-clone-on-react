@@ -7,7 +7,8 @@ const errorMessageVariants = {
   inline: { display: 'inline-block' },
 }
 
-function ErrorMessage({ error, variant = 'stacked', ...props }) {
+function ErrorMessage({error, variant = 'stacked', ...props}) {
+  console.log('error: ', error);
   return (
     <div
       role="alert"

@@ -9,6 +9,9 @@ import {
 import axios from "axios"
 import SpotifyWebApi from 'spotify-web-api-node'
 import UnauthenticatedApp from 'unauthenticated-app'
+import { useQueryClient } from 'react-query'
+
+
 
 const LOCALSTORAGE_KEYS = {
   accessToken: '__auth_provider_access_token__',
@@ -98,15 +101,16 @@ function useGetToken() {
       })
       // calc time the token will expire (spoiler: it's 3600ms)
     }, 
-      // we’re essentially gonna refresh one minute before it expires
-      timeStamp + (expiresIn * 1000 - 3600) - Date.now()
+      // we’re essentially gonna refresh three minutes before it expires
+      timeStamp + (expiresIn * 1000 - 10800) - Date.now()
+      // 5000
       )
       if (timeStamp && expiresIn) {
-        console.log('(expiresIn - 60) * 1000): ', timeStamp + (expiresIn * 1000 - 3600) - Date.now());   
+        console.log('(expiresIn - 60) * 1000): ', timeStamp + (expiresIn * 1000 - 10800) - Date.now());   
       }
     return () => clearInterval(interval)
   }, [refreshToken, expiresIn])
-
+  console.log('(expiresIn - 60) * 1000): ', timeStamp + (expiresIn * 1000 - 10800) - Date.now());   
   return accessToken
 }
 
@@ -119,7 +123,7 @@ function login(params) {
   
 }
 
-function logout() {
+function logout(queryClient) {
   clearAuthData()
   window.location = '/'
 }

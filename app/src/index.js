@@ -2,6 +2,7 @@ import './bootstrap'
 import * as React from 'react'
 import ReactDOM from 'react-dom'
 import App from './app'
+import {QueryClient, QueryClientProvider, useQueryClient} from 'react-query'
 
 /* 
   🕸️ Useful links: 🕸️

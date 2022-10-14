@@ -1,18 +1,7 @@
 function useGetToken() {
   const code = new URLSearchParams(window.location.search).get('code')
 
-  /*
-  const [accessToken, setAccessToken] = useAccessToken()
-  const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
-  const [refreshToken, setRefreshToken] = useRefreshToken()
-  const [localStorageRefreshToken, setLocalStorageRefreshToken] = useLocalStorageState(LOCALSTORAGE_KEYS.refreshToken)
-  const [expiresIn, setExpiresIn] = useExpiresIn()
-  const [localStorageExpiresIn, setlocalStorageExpiresIn] = useLocalStorageState(LOCALSTORAGE_KEYS.expiresIn)
-  const [timeStamp, setTimestamp] = useTimeStamp()
-  const [localStorageTimeStamp, setLocalStorageTimeStamp] = useLocalStorageState(LOCALSTORAGE_KEYS.timeStamp)
-  */
-
-  const { accessTokenValue, refreshTokenValue, expiresInValue, timeStampValue } = useAuthData()
+  const {accessTokenValue, refreshTokenValue, expiresInValue, timeStampValue} = useAuthData()
 
 
 

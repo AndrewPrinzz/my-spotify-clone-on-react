@@ -3,6 +3,7 @@ import * as React from 'react'
 import ReactDOM from 'react-dom'
 import App from './app'
 import {QueryClient, QueryClientProvider, useQueryClient} from 'react-query'
+import {AppProviders} from './context/app-providers'
 
 /* 
   🕸️ Useful links: 🕸️
@@ -12,7 +13,9 @@ import {QueryClient, QueryClientProvider, useQueryClient} from 'react-query'
 
 ReactDOM.render(
   <React.StrictMode>
-    <App />
+    <AppProviders>
+      <App />
+    </AppProviders>
   </React.StrictMode>,
   document.getElementById('root')
 )

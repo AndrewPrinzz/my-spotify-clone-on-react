@@ -1,27 +1,37 @@
 import {useQuery, useQueryClient} from 'react-query'
 import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
+import {useAccessToken} from 'context/auth-context'
 
 function useTopPlaylists() {
   const spotifyApi = useSpotifyWebAPI()
+  const accessToken = useAccessToken()
+  console.log('accessToken: ', accessToken);
 
   const result = useQuery({
     queryKey: 'top-playlists',
-    queryFn: () => spotifyApi.getFeaturedPlaylists({limit: 3,  country: 'US', locale: 'en_US'})
+    queryFn: () => spotifyApi.getFeaturedPlaylists({limit: 3,  country: 'US', locale: 'en_US'}),
+    enabled: accessToken ? true : false
   })
 
   return {...result, playlists: result.data}
 }
 
+function usePlaylist(id) {
+  const spotifyApi = useSpotifyWebAPI()
+
+  const result = useQuery({
+    queryKey: ['playlist', { id }],
+    queryFn: () => spotifyApi.getPlaylist(id)
+  })
+
+  return {...result, playlist: result.data}
+}
+
 function usePlaylistWithRecommendations(id) {
   const spotifyApi = useSpotifyWebAPI()
   const queryClient = useQueryClient()
-
-  const playlist = useQuery({
-    queryKey: ['playlist', {id}],
-    queryFn: () => spotifyApi.getPlaylist(id)
-  })
-  console.log('playlist: ', playlist);
-
+  const playlist = usePlaylist(id)
+  
   const recommendedPlaylists = useQuery({
     queryKey: ['recommended-playlist', {id}],
     queryFn: () => {
@@ -54,5 +64,6 @@ function usePlaylistWithRecommendations(id) {
 
 export {
   useTopPlaylists,
-  usePlaylistWithRecommendations
+  usePlaylistWithRecommendations,
+  usePlaylist
 }

@@ -11,9 +11,7 @@ const AUTH_URL =
 
 function UnauthenticatedApp() {
   return (
-    <Router>
-      <AppRoutes />
-    </Router>
+    <AppRoutes />
   )
 }
 

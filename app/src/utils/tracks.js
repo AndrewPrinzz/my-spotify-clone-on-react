@@ -3,6 +3,7 @@ import {useQuery} from 'react-query'
 import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
 import {useQueryClient} from 'react-query'
+import { useAccessToken } from 'context/auth-context'
 
 const loadingTrack = {
   album: {
@@ -74,11 +75,13 @@ function useSavedTracks() {
 function useRecommendedTracks() {
   const spotifyApi = useSpotifyWebAPI()
   const queryClient = useQueryClient()
+  const accessToken = useAccessToken()
 
   // getting our seeds
   const {data: seedsData, status: seedsStatus} = useQuery({
-    queryKey: 'seeds-data',
-    queryFn: () => spotifyApi.getMyTopTracks({ limit: 2 })
+    queryKey: ['seeds-data', accessToken],
+    queryFn: () => spotifyApi.getMyTopTracks({limit: 2}),
+    enabled: !!accessToken
   })
 
   const result = useQuery({

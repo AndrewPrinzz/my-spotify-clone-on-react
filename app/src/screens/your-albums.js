@@ -6,10 +6,10 @@ import {
   SpotifyPlaylistInfoFallback,
   SpotifyPlaylistDataView,
 } from 'components/playlists'
-import {useAlbums} from 'utils/album'
+import {useAlbumItems} from 'utils/album'
 
 function YourAlbums() {
-  const {albums, isLoading, isSuccess} = useAlbums()
+  const {albums, isLoading, isSuccess} = useAlbumItems()
   
   const setData = (albums) => albums.reduce((p, n) => p.concat([n.album]), [])
 

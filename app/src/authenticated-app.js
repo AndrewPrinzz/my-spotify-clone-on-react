@@ -18,16 +18,13 @@ import {YourLibrary} from 'screens/your-library'
 import {YourAlbums} from 'screens/your-albums'
 import {NotFoundScreen} from 'screens/not-found'
 import {useLocalStorageState} from 'utils/hooks'
-import {useAccessToken, useAccessTokenWithLocalStorage} from 'context/auth-context'
+import {useAccessToken} from 'context/auth-context'
 import * as auth from 'auth-provider'
-import {useCode, useSpotifyWebAPI} from 'context/spotify-web-api-context'
-import SpotifyWebApi from 'spotify-web-api-node'
+import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
 import {Player} from 'components/player'
 import {LOCALSTORAGE_KEYS} from 'auth-provider'
-import {useSpotifyData} from 'utils/hooks'
-// import {useUserData} from 'context/user-data-context'
-// import {useUserData} from 'utils/user-data'
-import {useQuery, useQueryClient} from 'react-query'
+import {useQuery} from 'react-query'
+import {AppProviders as Test} from 'context/app-providers'
 
 // If we have an error
 function ErrorFallback({error}) {
@@ -46,28 +43,27 @@ function ErrorFallback({error}) {
 }
 
 function AuthenticatedApp({logout}) {
-  const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
-  
-  const spotifyApi = useSpotifyWebAPI()
-  const getToken = auth.getToken()
-  
-  const getAccessToken = localStorageAccessToken ? localStorageAccessToken : getToken
-  const [accessToken, setAccessToken] = useAccessToken()
-  
-  // 
-  React.useEffect(() => {
-    if (!getAccessToken) return
-    // 👩‍🏫 We use this awesome API in the entire app: `https://github.com/thelinmichael/spotify-web-api-node`
-    spotifyApi.setAccessToken(getAccessToken)
-    setAccessToken(getAccessToken)
-    setLocalStorageAccessToken(getAccessToken)
+  // const [accessToken, setAccessToken] = useAccessToken()
+  // const spotifyApi = useSpotifyWebAPI()
 
-  }, [getAccessToken])
+  // const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
+  
+  // const getToken = auth.getToken()
+  
+  // const getAccessToken = localStorageAccessToken ? localStorageAccessToken : getToken
+  
+  // // 
+  // React.useEffect(() => {
+  //   if (!getAccessToken) return
+  //   // 👩‍🏫 We use this awesome API in the entire app: `https://github.com/thelinmichael/spotify-web-api-node`
+  //   spotifyApi.setAccessToken(getAccessToken)
+  //   setAccessToken(getAccessToken)
+  //   setLocalStorageAccessToken(getAccessToken)
+  // }, [getAccessToken])
 
   return (
       // Error boundary provider
       <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
-        <Router>
           <div className={css`
             background: linear-gradient(101.32deg, #292929 1.55%, #1E1322 90.79%);
             display: flex;
@@ -86,7 +82,6 @@ function AuthenticatedApp({logout}) {
               <Player />
             </div>
           </div>
-        </Router>
       </ErrorBoundary>
   )
 }
@@ -152,21 +147,15 @@ const fallbackUserData = {
 }
 
 function Nav() {
-  const [accessToken] = useAccessToken()
   const spotifyWebApi = useSpotifyWebAPI()
-  const queryClient = useQueryClient()
 
   const logout = auth.logout
 
-  const {status, data, error, run, isLoading, isSuccess} = useSpotifyData({
-    status: 'pending',
+  const {data: user, isLoading, isSuccess, isLoadingError} = useQuery({
+    queryKey: 'user',
+    queryFn: () => spotifyWebApi.getMe()
   })
-  
-  React.useEffect(() => {
-    if (!accessToken) return
-    
-    run(spotifyWebApi.getMe())
-  }, [accessToken, run])
+  console.log('isLoadingError: ', isLoadingError);
 
   return (
     <NavBar className={css`
@@ -183,14 +172,14 @@ function Nav() {
         {isLoading ? (
           <>
             <NavPfp src={pfp} />
-            <NavName>Alice</NavName>
+            <NavName>Loading...</NavName>
           </>
         ) : isSuccess ? (
           <>
-            {/* <NavPfp src={data.body.images[0].url} /> */}
+            {/* <NavPfp src={user.body.images[0].url} /> */}
             <NavPfp src={pfp} />
             <NavName>
-              {data.body.display_name}
+              {user.body.display_name}
             </NavName>
           </>
         ) : null}

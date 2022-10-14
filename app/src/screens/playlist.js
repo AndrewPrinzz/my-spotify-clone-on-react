@@ -10,7 +10,6 @@ import {
 } from 'components/tracks'
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
 import {loadingPlaylists} from 'utils/playlist-fallback'
-import {useQuery, useQueryClient} from 'react-query'
 import {usePlaylistWithRecommendations} from 'utils/playlist'
 
 // http://localhost:3000/playlist/37i9dQZF1DX4JAvHpjipBk solve this

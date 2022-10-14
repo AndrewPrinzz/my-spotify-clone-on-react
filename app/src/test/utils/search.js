@@ -4,44 +4,17 @@ import {jsx} from '@emotion/react'
 import React from 'react'
 
 import {
-  SpotifySearchTracksDataView,
   SearchQueryErrorBoundary,
 } from 'components/playlists'
 
-import {Player} from 'components/player'
 import {useSpotifyData} from 'utils/hooks'
 import {QueryDataCacheProvider} from 'context/query-data-cache-context'
-import {useQueryDataCache} from 'context/query-data-cache-context'
-import {useLocalStorageState} from 'utils/hooks'
 import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
 import {useAccessToken} from 'context/auth-context'
 import {
   SpotifyTrackInfoFallback,
   SpotifyTrackDataView
 } from 'components/tracks'
-import { useQuery } from 'react-query'
-
-function PreviousQuery({onSelect}) {
-  const cache = useQueryDataCache()
-
-  return (
-    <div>
-      PreviousQuery
-      <ul css={{ listStyle: 'none', paddingLeft: 0 }}>
-        {Object.keys(cache).map(searchQuery => (
-          <li key={searchQuery} css={{ margin: '4px auto' }}>
-            <button
-              css={{ width: '100%', color: '#fff', background: 'transparent' }}
-              onClick={() => onSelect(searchQuery)}
-            >
-              {searchQuery}
-            </button>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
 
 function SpotifySearchQueryInfo({searchQuery}) {
   const [accessToken] = useAccessToken()

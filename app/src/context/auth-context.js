@@ -88,6 +88,11 @@ function useTimeStamp() {
   return context
 }
 
+const AuthContextNew = React.createContext()
+AuthContextNew.displayName = 'AuthContextNew'
+
+
+
 export {
   AccessTokenProvider,
   useAccessToken,
@@ -97,5 +102,6 @@ export {
   useExpiresIn,
   TimeStampProvider,
   useTimeStamp,
-  LOCALSTORAGE_KEYS
+  LOCALSTORAGE_KEYS,
+  AuthContextNew
 }

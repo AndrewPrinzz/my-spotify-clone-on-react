@@ -13,20 +13,20 @@ import axios from 'axios'
 import {SearchBox} from 'components/lib'
 import {Link} from 'react-router-dom'
 
+const fallbackSpotifyData = {
+  "tracks": {
+    "total": 'XXX'
+  },
+  "images": [
+    {
+      "url": fallbackSpotify,
+    }
+  ],
+  name: 'Loading...',
+  fetchedAt: 'loading...'
+}
+
 function SpotifyPlaylistInfoFallback({data}) {
-
-  const fallbackSpotifyData = {
-    "tracks": {
-      "total": 'XXX'
-    },
-    "images": [
-      {
-        "url": fallbackSpotify,
-      }
-    ],
-    fetchedAt: 'loading...'
-  }
-
   // get limit to make an object
   const {limit} = data || 3
   // making an array for filling data
@@ -221,5 +221,6 @@ export {
   SpotifyPlaylistDataView, 
   SpotifySearchTracksDataView, 
   SearchQueryErrorBoundary,
-  SearchForm
+  SearchForm,
+  fallbackSpotifyData
 }

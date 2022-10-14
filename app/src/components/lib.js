@@ -44,9 +44,12 @@ export const NavBar = styled.nav`
 export const NavPfp = styled.img`
   max-width: 74px;
   max-height: 74px;
+  min-width: 74px;
+  min-height: 74px;
   object-fit: cover;
   border-radius: 50px; 
   margin-right: 21px;
+  background: ${colors.blue}
 `
 
 export const NavName = styled.div`

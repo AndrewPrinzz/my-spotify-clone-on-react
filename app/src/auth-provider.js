@@ -8,8 +8,6 @@ import {
 } from 'context/auth-context'
 import axios from "axios"
 import SpotifyWebApi from 'spotify-web-api-node'
-import UnauthenticatedApp from 'unauthenticated-app'
-import { useQueryClient } from 'react-query'
 
 
 
@@ -50,7 +48,6 @@ function useGetToken() {
     // if we don't have res.data then we set value from local storage
     setAccessToken(res?.data?.accessToken)
     setLocalStorageAccessToken(res?.data?.accessToken)
-
 
     if (res.data.refreshToken) {
       setRefreshToken(res?.data?.refreshToken)
@@ -114,16 +111,7 @@ function useGetToken() {
   return accessToken
 }
 
-// function handleUserResponse({ user }) {
-//   window.localStorage.setItem(localStorageKey, user.token)
-//   return user
-// }
-
-function login(params) {
-  
-}
-
-function logout(queryClient) {
+function logout() {
   clearAuthData()
   window.location = '/'
 }

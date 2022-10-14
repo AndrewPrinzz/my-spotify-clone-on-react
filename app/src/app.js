@@ -1,50 +1,42 @@
 import React from 'react'
-import {AccessTokenProvider, ExpiresInProvider, RefreshTokenProvider, TimeStampProvider} from 'context/auth-context'
-import {CodeProvider, SpotifyWebAPIProvider} from 'context/spotify-web-api-context'
-import {PlayerProvider, OffsetProvider} from 'context/player-context'
-import {QueryDataCacheProvider} from 'context/query-data-cache-context'
 import AuthenticatedApp from './authenticated-app'
 import UnauthenticatedApp from './unauthenticated-app'
 import {useLocalStorageState} from 'utils/hooks'
 import * as auth from 'auth-provider'
-import {UserDataProvider} from 'context/user-data-context'
-import {QueryClient, QueryClientProvider} from 'react-query'
-import {SearchQueryProvider} from 'context/search-query-context'
+import {useAccessToken} from 'context/auth-context'
+import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
+import {LOCALSTORAGE_KEYS} from 'context/auth-context'
+
+const login =
+  "https://accounts.spotify.com/authorize?client_id=b614d13fd2e74dec81743395e7d0efd6&response_type=code&redirect_uri=http://localhost:3000&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state"
 
 const code = new URLSearchParams(window.location.search).get('code')
-const queryClient = new QueryClient()
 
-function AppProviders({children}) {
-  return (
-    <>
-      <QueryClientProvider client={queryClient}>
-        <CodeProvider>
-          <SearchQueryProvider>
-            <SpotifyWebAPIProvider>
-              <AccessTokenProvider>
-                <UserDataProvider>
-                  <PlayerProvider>
-                    <OffsetProvider>
-                      <ExpiresInProvider>
-                        <RefreshTokenProvider>
-                          <TimeStampProvider>
-                            {children}
-                          </TimeStampProvider>
-                        </RefreshTokenProvider>
-                      </ExpiresInProvider>
-                    </OffsetProvider>
-                  </PlayerProvider>
-                </UserDataProvider>
-              </AccessTokenProvider>
-            </SpotifyWebAPIProvider>
-          </SearchQueryProvider>
-        </CodeProvider>
-      </QueryClientProvider>
-    </>
-  )
+function getUser() {
+  let user = null
+
+  const token = auth.getToken()
 }
 
 function App() {
+  const [accessToken, setAccessToken] = useAccessToken()
+  const spotifyApi = useSpotifyWebAPI()
+
+  const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
+  
+  const getToken = auth.getToken()
+  
+  const getAccessToken = localStorageAccessToken ? localStorageAccessToken : getToken
+  
+  // 
+  React.useEffect(() => {
+    if (!getAccessToken) return
+    // 👩‍🏫 We use this awesome API in the entire app: `https://github.com/thelinmichael/spotify-web-api-node`
+    spotifyApi.setAccessToken(getAccessToken)
+    setAccessToken(getAccessToken)
+    setLocalStorageAccessToken(getAccessToken)
+  }, [getAccessToken])
+
   const [localStorageTokenExpireTime] = useLocalStorageState('__auth_provider_expire_time__')
   const [localStorageTimeStamp] = useLocalStorageState('__auth_provider_token_timestamp__')
   // This function uses the timestamp stored in local storage to check if the amount of time elapsed since the timestamp is greater than the access token's expire time (3600 seconds). If it is, then we can assume the token has expired and we need to fetch a new one.
@@ -61,24 +53,17 @@ function App() {
   console.log('((Date.now() - Number(localStorageTimeStamp)) / 1000): ', ((Date.now() - Number(localStorageTimeStamp)) / 1000));
   console.log('Number(localStorageTokenExpireTime): ', Number(localStorageTokenExpireTime));
 
-  const login =
-    "https://accounts.spotify.com/authorize?client_id=b614d13fd2e74dec81743395e7d0efd6&response_type=code&redirect_uri=http://localhost:3000&scope=streaming%20user-read-email%20user-read-private%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state"
+  
 
   // check if we have access
   return (
     <>
-      <AppProviders>
-        {/* {code ? <AuthenticatedApp /> : <UnauthenticatedApp />} */}
-        {Boolean(code) || Boolean(isTokenActual.current) ?
-          <AuthenticatedApp logout={auth.logout} /> : 
-          <UnauthenticatedApp />
-        }
-        {/* <AuthenticatedApp /> */}
-      </AppProviders>
+      {Boolean(code) || Boolean(isTokenActual.current) ?
+        <AuthenticatedApp logout={auth.logout} /> : 
+        <UnauthenticatedApp />
+      }
     </>
   )
-  
-  // return <UnauthenticatedApp />
 }
 
 export default App

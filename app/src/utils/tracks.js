@@ -1,9 +1,9 @@
 import React from 'react'
-import {useQuery} from 'react-query'
-import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
+import {useQuery, useInfiniteQuery} from 'react-query'
+import {useAuth} from 'context/auth-context'
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
 import {useQueryClient} from 'react-query'
-import { useAccessToken } from 'context/auth-context'
+import {useInView} from 'react-intersection-observer'
 
 const loadingTrack = {
   album: {
@@ -41,7 +41,7 @@ const loadingTracks = (length) => Array.from({ length: length }, (v, index) => (
 }))
 
 function useTracksSearch(query) {
-  const spotifyApi = useSpotifyWebAPI()
+  const {spotifyApi} = useAuth()
   
   // {data: searchData, isIdle, isLoading, isSuccess, isLoadingError}
 
@@ -61,27 +61,50 @@ function useTracksSearch(query) {
     return {...result, tracks: result.data ?? loadingTrack}
 }
 
-function useSavedTracks() {
-  const spotifyWebApi = useSpotifyWebAPI()
+function useSavedTracks() {  
+  const {spotifyApi} = useAuth()
 
-  const result = useQuery({
-    queryKey: 'your-album',
-    queryFn: () => spotifyWebApi.getMySavedTracks({limit: 50})
+  const {ref, inView} = useInView({
+    rootMargin: '500px'
   })
 
-  return {...result, tracks: result.data}
+  const fetchData = async ({pageParam} = {}) => {
+    const limit = pageParam?.limit || 50
+    const offset = pageParam?.offset || 0
+
+    return spotifyApi.getMySavedTracks({limit: limit, offset: offset})
+  }
+
+  const result = useInfiniteQuery(
+    // queryKey
+    'your-album',
+    // queryFn 
+    fetchData, {
+    getNextPageParam: (lastPage) => {
+        const limit = 50
+      
+        if (lastPage?.body?.next) {
+          return {
+            limit: limit,
+            offset: lastPage.body.offset + limit
+          }
+        } else return null
+      
+      }
+    }
+  )
+
+  return {...result, tracks: result.data, ref, inView}
 }
 
 function useRecommendedTracks() {
-  const spotifyApi = useSpotifyWebAPI()
+  const {spotifyApi} = useAuth()
   const queryClient = useQueryClient()
-  const accessToken = useAccessToken()
 
   // getting our seeds
   const {data: seedsData, status: seedsStatus} = useQuery({
-    queryKey: ['seeds-data', accessToken],
+    queryKey: ['seeds-data'],
     queryFn: () => spotifyApi.getMyTopTracks({limit: 2}),
-    enabled: !!accessToken
   })
 
   const result = useQuery({

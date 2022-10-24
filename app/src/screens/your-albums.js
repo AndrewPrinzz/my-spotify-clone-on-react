@@ -1,7 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import {jsx} from '@emotion/react'
 
-import {Browse, Greeting} from 'components/lib'
+import {Browse, Greeting, AlbumsContainer} from 'components/lib'
 import {
   SpotifyPlaylistInfoFallback,
   SpotifyPlaylistDataView,
@@ -15,15 +15,16 @@ function YourAlbums() {
 
   return (
     <Browse>
-      <Greeting css={{width: '100%'}}>Your Albums</Greeting>
-      <div css={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        flexWrap: 'wrap',
-        flexDirection: 'initial'
-      }}>
+        <Greeting css={{
+          width: '100%',
+          marginTop: '0',
+          '@media (max-width: 768px)': {
+            marginTop: '0'
+          }
+        }}>Your Albums</Greeting>
+      <AlbumsContainer>
         {isLoading ? (
-          <SpotifyPlaylistInfoFallback />
+          <SpotifyPlaylistInfoFallback limit={6} />
         ) : isSuccess && albums.length ? (
           <>
             <SpotifyPlaylistDataView data={setData(albums)} />
@@ -33,7 +34,7 @@ function YourAlbums() {
             Hmmm... I couldn't find any albums to show for you. Sorry. Maybe you haven't saved anything yet?
           </span>
         ) : null}
-      </div>
+      </AlbumsContainer>
     </Browse>
   )
 }

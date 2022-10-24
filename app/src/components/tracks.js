@@ -50,9 +50,6 @@ function SpotifyTrackDataView({data}) {
   const [, setOffset] = useOffset() 
 
   function chooseTrack(track, index) {
-    console.log('track: ', track);
-    console.log('data: ', data);
-    console.log('index: ', index);
     
     // we don't have a uri if we're loading so we have to do nothing
     if (!track) return

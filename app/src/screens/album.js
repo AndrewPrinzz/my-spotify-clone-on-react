@@ -3,7 +3,7 @@ import {jsx} from '@emotion/react'
 import React from 'react'
 
 import { Link, useParams} from 'react-router-dom'
-import {Browse, PlaylistCover, PlaylistScreen, PlaylistImageCover, PlaylistAlbumArtist, PlaylistAlbumName, PlaylistAlbumTotalTracks, PlaylistAlbumText, PlaylistImage, PlaylistContainer, PlaylistBrowseBlockTracks, PlaylistBrowseBlockSimilarAlbums, PlaylistAlbumDescription, SimilarPlaylist, PlaylistBrowseBlockSimilarAlbumsContent, InterfaceTitle} from 'components/lib'
+import {Browse, PlaylistCover, PlaylistScreen, PlaylistImageCover, PlaylistImageMobile, PlaylistAlbumName, PlaylistAlbumTotalTracks, PlaylistAlbumText, PlaylistImage, PlaylistContainer, PlaylistBrowseBlockTracks, PlaylistBrowseBlockSimilarAlbums, PlaylistCoverContainer, SimilarPlaylist, PlaylistBrowseBlockSimilarAlbumsContent, InterfaceTitle} from 'components/lib'
 import {
   SpotifyTrackInfoFallback,
   SpotifyTrackDataView
@@ -11,8 +11,7 @@ import {
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
 import {loadingPlaylists} from 'utils/playlist-fallback'
 import {StatusButtons} from 'components/status-buttons'
-import {useAlbum, useAlbumWithRecommendations} from 'utils/album'
-import { useQueryClient } from 'react-query'
+import {useAlbumWithRecommendations} from 'utils/album'
 
 function Album() {
   const {id} = useParams()
@@ -34,39 +33,47 @@ function Album() {
 return (
   <PlaylistScreen>
     <PlaylistCover>
-      {isAlbumLoading ? (
-        <>
-          <PlaylistImageCover
-            cover={fallbackSpotify}
-            css={{ marginTop: 0 }}
-          />
-          <div>
-            <PlaylistAlbumText>Album</PlaylistAlbumText>
-            <PlaylistAlbumName>Loading...</PlaylistAlbumName>
-            {/* <PlaylistAlbumDescription>Loading</PlaylistAlbumDescription> */}
-            <PlaylistAlbumTotalTracks>?? tracks</PlaylistAlbumTotalTracks>
-          </div>
-        </>
-      ) : isAlbumSuccess ? (
-        <>
-          <PlaylistImageCover
-            cover={album.body.images[0].url}
-            css={{ marginTop: 0 }}
-          />
-          <div>
-            <PlaylistAlbumText>Album</PlaylistAlbumText>
-            <PlaylistAlbumName>{album.body.name}</PlaylistAlbumName>
-            {/* <PlaylistAlbumDescription>{album.body.description}</PlaylistAlbumDescription> */}
-            <PlaylistAlbumTotalTracks>{album.body.tracks.total} tracks</PlaylistAlbumTotalTracks>
-          </div>
-        </>
-      ) : null}
+      <PlaylistCoverContainer>
+        {isAlbumLoading ? (
+          <>
+            <PlaylistImageCover
+              cover={fallbackSpotify}
+              css={{ marginTop: 0 }}
+            />
+            <PlaylistImageMobile 
+              cover={fallbackSpotify}
+              css={{marginTop: '0!important'}}
+            />
+            <div>
+              <StatusButtons id={id} album={album} />
+              <PlaylistAlbumText>Album</PlaylistAlbumText>
+              <PlaylistAlbumName>Loading...</PlaylistAlbumName>
+              <PlaylistAlbumTotalTracks>?? tracks</PlaylistAlbumTotalTracks>
+            </div>
+          </>
+        ) : isAlbumSuccess ? (
+          <>
+            <PlaylistImageCover
+              cover={album.body.images[0].url}
+              css={{marginTop: 0}}
+            />
+            <PlaylistImageMobile 
+              src={album.body.images[0].url}
+              css={{marginTop: '0!important'}}
+            />
+            <div>
+              <StatusButtons id={id} album={album} />
+              <PlaylistAlbumText>Album</PlaylistAlbumText>
+              <PlaylistAlbumName>{album.body.name}</PlaylistAlbumName>
+              {/* <PlaylistAlbumDescription>{album.body.description}</PlaylistAlbumDescription> */}
+              <PlaylistAlbumTotalTracks>{album.body.tracks.total} tracks</PlaylistAlbumTotalTracks>
+            </div>
+          </>
+        ) : null}
+      </PlaylistCoverContainer>
     </PlaylistCover>
     <PlaylistContainer>
       <PlaylistBrowseBlockTracks>
-        {/* Status Buttons */}
-        <StatusButtons id={id} album={album} />
-        {/* Status Buttons */}
         {isAlbumLoading ? (
           <SpotifyTrackInfoFallback limit={20} />
         ) : isAlbumSuccess && album.body.tracks.items.length ? (
@@ -84,7 +91,12 @@ return (
           {isReccommendedLoading || isReccommendedIdle ? (
             <>
               {loadingPlaylists(4).map(({ album }, index) =>
-                <SimilarPlaylist cover={album.images[2].url} key={album.id} />
+                <>
+                  <SimilarPlaylist cover={album.images[2].url} key={album.id} />
+                  <PlaylistImageMobile 
+                    src={album.images[2].url}
+                  />
+                </>
               )}
             </>
           ) : isReccommendedSuccess && reccommendedAlbums.body.tracks.length ? (
@@ -92,6 +104,10 @@ return (
               {reccommendedAlbums.body.tracks.map(({ album }) =>
                 <Link to={`/album/${album.id}`} key={album.id}>
                   <SimilarPlaylist cover={album.images[1].url} />
+                  <PlaylistImageMobile
+                    css={{marginTop: 0}}
+                    src={album.images[1].url}
+                  />
                 </Link>
               )}
             </>

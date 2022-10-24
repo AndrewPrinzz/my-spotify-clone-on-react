@@ -1,6 +1,5 @@
-import React from 'react'
 import {useQuery, useQueryClient, useMutation} from 'react-query'
-import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
+import {useAuth} from 'context/auth-context'
 
 const getAlbumItemsConfig = (queryClient, spotifyApi, options) => ({
   queryKey: 'album-items',
@@ -8,7 +7,7 @@ const getAlbumItemsConfig = (queryClient, spotifyApi, options) => ({
   queryFn: () => {
     // we have to to that through getMySavedAlbums to get all of the saved albums data if you sure you want to do that
     return spotifyApi.getMySavedAlbums({limit: 50})
-      .then(playlistData => playlistData.body.items)
+      .then(albumData => albumData.body.items)
   },
   onSuccess(albums) {
     for (const {album} of albums) {
@@ -19,7 +18,7 @@ const getAlbumItemsConfig = (queryClient, spotifyApi, options) => ({
 })
 
 function useAlbumItems(options = {}) {
-  const spotifyApi = useSpotifyWebAPI()
+  const {spotifyApi} = useAuth()
   const queryClient = useQueryClient()
 
   const result = useQuery(getAlbumItemsConfig(queryClient, spotifyApi, options))
@@ -28,7 +27,7 @@ function useAlbumItems(options = {}) {
 }
 
 function useAlbum(id, options = {}) {
-  const spotifyApi = useSpotifyWebAPI()
+  const {spotifyApi} = useAuth()
 
   const result = useQuery({
     queryKey: ['album', {id}],
@@ -39,13 +38,13 @@ function useAlbum(id, options = {}) {
 }
 
 function useAlbumWithRecommendations(id, options = {}) {
-  const spotifyApi = useSpotifyWebAPI()
+  const {spotifyApi} = useAuth()
   const queryClient = useQueryClient()
 
   const album = useAlbum(id, options)
 
   const recommendedAlbums = useQuery({
-    queryKey: ['recommended-album', { id }],
+    queryKey: ['recommended-album', {id}],
     queryFn: () => {
       const seeds = album.data.body.tracks.items.reduce((prevValue, nextValue) =>
         prevValue.concat(nextValue.id)
@@ -58,7 +57,7 @@ function useAlbumWithRecommendations(id, options = {}) {
         limit: 4
       })
     },
-    enabled: queryClient.getQueriesData(['recommended-album', { id }])[0]?.[1] ? false : album.isSuccess ? true : false
+    enabled: queryClient.getQueriesData(['recommended-album', {id}])[0]?.[1] ? false : album.isSuccess ? true : false,
   })
 
   return {
@@ -79,7 +78,7 @@ function useAlbumItem(id, options = {}) {
 }
 
 function useAddAlbum(id, album, options = {}) {
-  const spotifyApi = useSpotifyWebAPI()
+  const {spotifyApi} = useAuth()
   const queryClient = useQueryClient()
   
   return useMutation(
@@ -98,7 +97,7 @@ function useAddAlbum(id, album, options = {}) {
 }
 
 function useRemoveAlbum(id, options = {}) {
-  const spotifyApi = useSpotifyWebAPI()
+  const {spotifyApi} = useAuth()
   const queryClient = useQueryClient()
   
   return useMutation(

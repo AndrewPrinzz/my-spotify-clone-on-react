@@ -3,8 +3,6 @@ function useGetToken() {
 
   const {accessTokenValue, refreshTokenValue, expiresInValue, timeStampValue} = useAuthData()
 
-
-
   React.useEffect(() => {
     // if we have access token in our localStorage then we do nothing
     if (!code) return

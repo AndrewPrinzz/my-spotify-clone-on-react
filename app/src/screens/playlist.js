@@ -2,8 +2,7 @@
 import {jsx} from '@emotion/react'
 
 import {Link, useParams} from 'react-router-dom'
-import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
-import {Browse, PlaylistCover, PlaylistScreen, PlaylistImageCover, PlaylistAlbumArtist, PlaylistAlbumName, PlaylistAlbumTotalTracks, PlaylistAlbumText, PlaylistImage, PlaylistContainer, PlaylistBrowseBlockTracks, PlaylistBrowseBlockSimilarAlbums, PlaylistAlbumDescription, SimilarPlaylist, PlaylistBrowseBlockSimilarAlbumsContent, InterfaceTitle} from 'components/lib'
+import {Browse, PlaylistCover, PlaylistScreen, PlaylistImageCover, PlaylistImageMobile, PlaylistAlbumName, PlaylistAlbumTotalTracks, PlaylistAlbumText, PlaylistCoverContainer, PlaylistContainer, PlaylistBrowseBlockTracks, PlaylistBrowseBlockSimilarAlbums, PlaylistAlbumDescription, SimilarPlaylist, PlaylistBrowseBlockSimilarAlbumsContent, InterfaceTitle} from 'components/lib'
 import {
   SpotifyTrackInfoFallback,
   SpotifyTrackDataView
@@ -26,39 +25,49 @@ function Playlist() {
     isReccommendedLoading,
     isReccommendedSuccess,
   } = usePlaylistWithRecommendations(id)
-
+  
   const setData = (data) => data.reduce((p, n) => p.concat(n.track), [])
 
   return (
     <PlaylistScreen>
       <PlaylistCover>
-        {isPlaylistLoading ? (
+        <PlaylistCoverContainer>
+          {isPlaylistLoading ? (
+            <>
+              <PlaylistImageCover
+                cover={fallbackSpotify}
+                css={{marginTop: '0!important'}}
+              />
+              <PlaylistImageMobile 
+                src={fallbackSpotify}
+                css={{marginTop: '0!important'}}
+              />
+              <div>
+                <PlaylistAlbumText>Playlist</PlaylistAlbumText>
+                <PlaylistAlbumName>Loading...</PlaylistAlbumName>
+                <PlaylistAlbumDescription>Loading</PlaylistAlbumDescription>
+                <PlaylistAlbumTotalTracks>?? tracks</PlaylistAlbumTotalTracks>
+              </div>
+            </>
+          ) : isPlaylistSuccess ? (
           <>
             <PlaylistImageCover
-              cover={fallbackSpotify}
-              css={{marginTop: 0}}
+              cover={playlist?.body.images[0].url}
+              css={{marginTop: '0!important'}}
+            />
+            <PlaylistImageMobile 
+              src={playlist?.body.images[0].url}
+              css={{marginTop: '0!important'}}
             />
             <div>
               <PlaylistAlbumText>Playlist</PlaylistAlbumText>
-              <PlaylistAlbumName>Loading...</PlaylistAlbumName>
-              <PlaylistAlbumDescription>Loading</PlaylistAlbumDescription>
-              <PlaylistAlbumTotalTracks>?? tracks</PlaylistAlbumTotalTracks>
+              <PlaylistAlbumName>{playlist?.body.name}</PlaylistAlbumName>
+              <PlaylistAlbumDescription>{playlist?.body.description}</PlaylistAlbumDescription>
+              <PlaylistAlbumTotalTracks>{playlist?.body.tracks.total} tracks</PlaylistAlbumTotalTracks>
             </div>
           </>
-        ) : isPlaylistSuccess ? (
-        <>
-          <PlaylistImageCover
-            cover={playlist?.body.images[0].url}
-            css={{marginTop: 0}}
-          />
-          <div>
-            <PlaylistAlbumText>Playlist</PlaylistAlbumText>
-            <PlaylistAlbumName>{playlist?.body.name}</PlaylistAlbumName>
-            <PlaylistAlbumDescription>{playlist?.body.description}</PlaylistAlbumDescription>
-            <PlaylistAlbumTotalTracks>{playlist?.body.tracks.total} tracks</PlaylistAlbumTotalTracks>
-          </div>
-        </>
-      ) : null}
+        ) : null}
+        </PlaylistCoverContainer>
       </PlaylistCover>
         <PlaylistContainer>
           <PlaylistBrowseBlockTracks>

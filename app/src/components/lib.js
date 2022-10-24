@@ -1,4 +1,7 @@
-import { css, injectGlobal } from '@emotion/css'
+/** @jsxImportSource @emotion/react */
+import {jsx} from '@emotion/react'
+
+import {keyframes} from '@emotion/css'
 import * as colors from 'styles/colors'
 import * as sizes from 'styles/sizes'
 import 'styles/fonts'
@@ -7,6 +10,39 @@ import bgclogin from 'assets/img/background-login.jpg'
 import styled from '@emotion/styled/macro'
 import {Link} from 'react-router-dom'
 import SpotifyWebPlayer from 'react-spotify-web-playback/lib'
+import {FaSpinner} from 'react-icons/fa'
+
+const spin = keyframes({
+  '0%': {transform: 'rotate(0deg)'},
+  '100%': {transform: 'rotate(360deg)'},
+})
+
+export const Spinner = styled(FaSpinner)({
+  animation: `${spin} 1s linear infinite`,
+})
+
+Spinner.defaultProps = {
+  'aria-label': 'loading',
+}
+
+export function FullPageSpinner() {
+  return (
+    <div
+      css={{
+        fontSize: '4em',
+        height: '100vh',
+        width: '100%',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        background: colors.dark
+      }}
+    >
+      <Spinner />
+    </div>
+  )
+}
 
 export const LoginContainer = styled.div`
   display: flex;
@@ -39,6 +75,21 @@ export const NavBar = styled.nav`
   max-width: 421px;
   min-width: 421px;
   padding: 80px;
+  @media (max-width: 1700px) {
+    max-width: 380px;
+    min-width: 380px;
+  }
+  @media (max-width: 1050px) {
+    padding: 40px;
+    max-width: 300px;
+    min-width: 300px;
+  }
+  @media (max-width: 992px) {
+    padding: 16px;
+    padding-top: 54px;
+    max-width: 63px;
+    min-width: 63px;
+  }
 `
 
 export const NavPfp = styled.img`
@@ -49,18 +100,42 @@ export const NavPfp = styled.img`
   object-fit: cover;
   border-radius: 50px; 
   margin-right: 21px;
-  background: ${colors.blue}
+  background: ${colors.blue};
+  @media (max-width: 1700px) {
+    max-width: 68px;
+    max-height: 68px;
+    min-width: 68px;
+    min-height: 68px;
+  }
+  @media (max-width: 992px) {
+    max-width: 50px;
+    max-height: 50px;
+    min-width: 50px;
+    min-height: 50px;
+    transform: translateX(-9px);
+  }
 `
 
 export const NavName = styled.div`
   font-size: 24px;
   font-weight: 600;
   color: ${colors.base};
+  @media (max-width: 1700px) {
+    font-size: 20px;
+  }
+  @media (max-width: 1050px) {
+    font-size: 16px;
+  }
+  @media (max-width: 992px) {
+    display: none;
+  }
 `
 
 export const MenuIcon = styled.div`
-  width: 30px;
-  height: 27px;
+  max-width: 30px;
+  max-height: 30px;
+  min-width: 30px;
+  min-height: 30px;
   text-align: center;
   cursor: pointer;
 `
@@ -77,6 +152,12 @@ export const MenuItem = styled.div`
   padding-left: 21px;
   cursor: pointer;
   color: inherit;
+  @media (max-width: 1700px) {
+    font-size: 18px;
+  }
+  @media (max-width: 992px) {
+    display: none
+  }
 `
 
 const menuDotVariants = {
@@ -88,7 +169,10 @@ const menuDotVariants = {
     fill: colors.base,
     position: `relative`,
     transition: '0',
-    borderRight: `3px solid ${colors.base}`,
+    borderRight: `0px solid ${colors.base}`,
+    '@media (max-width: 992px)': {
+      borderRight: `0px solid ${colors.base}`,
+    },
     // display: 'none',
     '::before': {
       transition: '0s',
@@ -97,7 +181,7 @@ const menuDotVariants = {
       width: `30px`,
       height: `27px`,
       position: `absolute`,
-      left: `-61px`
+      left: `-61px`,
     },
     svg: {
       path: {
@@ -128,10 +212,58 @@ export const MenuLink = styled.span`
 export const Browse = styled.div`
   display: flex;
   flex-direction: column;
+  margin: auto;
   margin-top: 78px;
-  margin-left: 112px;
-  width: ${sizes.container};
-  padding-bottom: 300px;
+  max-width: ${sizes.container};
+  padding-bottom: 200px;
+  width: 100%;
+  max-width: 1167px;
+  
+  @media (max-width: 1700px) {
+    max-width: 1100px;
+  }
+  @media (max-width: 1470px) {
+    max-width: 950px;
+  }
+  @media (max-width: 1370px) {
+    max-width: 900px;
+  }
+  @media (max-width: 1320px) {
+    max-width: 850px;
+  }
+  @media (max-width: 1270px) {
+    max-width: 800px;
+  }
+  @media (max-width: 1220px) {
+    max-width: 750px;
+  }
+  @media (max-width: 1170px) {
+    max-width: 720px;
+  }
+  @media (max-width: 1150px) {
+    max-width: 700px;
+  }
+  @media (max-width: 1120px) {
+    max-width: 650px;
+  }
+  @media (max-width: 1080px) {
+    max-width: 600px;
+  }
+  @media (max-width: 992px) {
+    max-width: 780px;
+    margin-top: 54px;
+  }
+  @media (max-width: 900px) {
+    max-width: 660px;
+    margin-top: 54px;
+  }
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+    max-width: 100%;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 `
 
 export const SearchBox = styled.div`
@@ -139,7 +271,7 @@ export const SearchBox = styled.div`
   flex-direction: column;
   width: 100%;
   position: relative;
-  marginTop: 10px;
+  margin-top: 0px;
   input {
     width: 100%;
     min-height: 60px;
@@ -171,6 +303,9 @@ export const SearchBox = styled.div`
 export const PlayListItems = styled.div`
   display: flex;
   justify-content: space-between;
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
 `
 export const PlayListItem = styled.div`
   display: flex;
@@ -178,6 +313,46 @@ export const PlayListItem = styled.div`
   min-width: 365px;
   max-width: 365px;
   flex-direction: column;
+  @media (max-width: 1700px) {
+    min-width: 330px;
+    max-width: 330px;
+  }
+  @media (max-width: 1500px) {
+    min-width: 300px;
+    max-width: 300px;
+  }
+  @media (max-width: 1370px) {
+    min-width: 280px;
+    max-width: 280px;
+  }
+  @media (max-width: 1320px) {
+    min-width: 250px;
+    max-width: 250px;
+  }
+  @media (max-width: 1220px) {
+    min-width: 230px;
+    max-width: 230px;
+  }
+  @media (max-width: 1150px) {
+    min-width: 210px;
+    max-width: 210px;
+  }
+  @media (max-width: 1090px) {
+    min-width: 190px;
+    max-width: 190px;
+  }
+  @media (max-width: 992px) {
+    min-width: 250px;
+    max-width: 250px;
+  }
+  @media (max-width: 900px) {
+    min-width: 210px;
+    max-width: 210px;
+  }
+  @media (max-width: 768px) {
+    max-width: 100%;
+    min-width: 100%;
+  }
 `
 
 export const PlaylistImage = styled.div`
@@ -192,6 +367,63 @@ export const PlaylistImage = styled.div`
   border-radius: 12px;
   background-repeat: no-repeat;
   background-size: cover;
+  @media (max-width: 1700px) {
+    min-width: 330px;
+    max-width: 330px;
+    min-height: 330px;
+    max-height: 330px;
+  }
+  @media (max-width: 1500px) {
+    min-width: 300px;
+    max-width: 300px;
+    min-height: 300px;
+    max-height: 300px;
+  }
+  @media (max-width: 1370px) {
+    min-width: 280px;
+    max-width: 280px;
+    min-height: 280px;
+    max-height: 280px;
+  }
+  @media (max-width: 1320px) {
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 250px;
+    max-height: 250px;
+  }
+  @media (max-width: 1220px) {
+    min-width: 230px;
+    max-width: 230px;
+    min-height: 230px;
+    max-height: 230px;
+  }
+  @media (max-width: 1150px) {
+    min-width: 210px;
+    max-width: 210px;
+    min-height: 210px;
+    max-height: 210px;
+  }
+  @media (max-width: 1090px) {
+    min-width: 190px;
+    max-width: 190px;
+    min-height: 190px;
+    max-height: 190px;
+  }
+  @media (max-width: 992px) {
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 250px;
+    max-height: 250px;
+  }
+  @media (max-width: 900px) {
+    min-width: 210px;
+    max-width: 210px;
+    min-height: 210px;
+    max-height: 210px;
+  }
+  @media (max-width: 768px) {
+    display: none;
+  }
   ::before {
     /* content: ''; */
     position: absolute;
@@ -211,6 +443,19 @@ export const PlaylistImage = styled.div`
       fill: color
     }
   })}
+`
+
+export const PlaylistImageMobile = styled.img`
+  display: none;
+  @media (max-width: 768px) {
+    display: flex;
+    border-radius: 12px;
+    width: 60%;
+    margin-top: 40px;
+  }
+  @media (max-width: 480px) {
+    width: 100%;
+  }
 `
 
 export const PlayListTracks = styled.div`
@@ -236,6 +481,13 @@ export const PlayListTitle = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  @media (max-width: 1320px) {
+    font-size: 22px;
+    max-width: 100%;
+  }
+  @media (max-width: 768px) {
+    white-space: initial;
+  }
 `
 
 export const PlayListGenre = styled.div`
@@ -265,7 +517,10 @@ export const Greeting = styled.div`
   letter-spacing: 0.02em;
   font-weight: bold;
   color: ${colors.base};
-  line-height: 61px;
+  line-height: 45px;
+  @media (max-width: 480px) {
+    font-size: 40px;
+  }
 `
 
 /* .js component */
@@ -274,6 +529,9 @@ export const InterfaceTitle = styled.div`
   margin-top: 60px;
   font-size: 30px;
   font-weight: bold;
+  @media (max-width: 480px) {
+    font-size: 20px;
+  }
 `
 
 export const InterfaceDspr = styled.div`
@@ -281,6 +539,9 @@ export const InterfaceDspr = styled.div`
   font-size: 16px;
   color: ${colors.gray};
   font-weight: bold;
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
 `
 
 export const SimilarBlocks = styled.div`
@@ -298,11 +559,17 @@ export const Track = styled.div`
   width: 48%;
   align-items: center;
   margin-top: 24px;
+  @media (max-width: 480px) {
+    width: 100%;
+  }
 `
 
 export const TrackItems = styled.div`
   display: flex;
   flex-wrap: wrap;
+  @media (max-width: 992px) {
+    flex-direction: column;
+  }
 `
 
 export const TrackImage = styled.div`
@@ -335,6 +602,18 @@ export const TrackImage = styled.div`
     },
   })}
   */
+  @media (max-width: 480px) {
+    max-width: 60px;
+    max-height: 60px;
+    min-width: 60px;
+    min-height: 60px;
+    img {
+      max-width: 60px;
+      max-height: 60px;
+      min-width: 60px;
+      min-height: 60px;
+    }
+  }
 `
 
 export const TrackInfo = styled.div`
@@ -353,13 +632,43 @@ export const TrackAuthor = styled.div`
   text-overflow: ellipsis;
   white-space: nowrap;
   overflow: hidden;
+  @media (max-width: 1500px) {
+    max-width: 328px;
+  }
+  @media (max-width: 1320px) {
+    max-width: 280px;
+  }
+  @media (max-width: 1240px) {
+    max-width: 240px;
+  }
+  @media (max-width: 1150px) {
+    max-width: 200px;
+  }
+  @media (max-width: 480px) {
+    font-size: 14px;
+  }
+  @media (max-width: 380px) {
+    max-width: 180px;
+  }
+  @media (max-width: 360px) {
+    max-width: 160px;
+  }
+  @media (max-width: 340px) {
+    max-width: 140px;
+  }
+  @media (max-width: 320px) {
+    max-width: 120px;
+  }
 `
 
 export const TrackName = styled.div`
   margin-top: 7px;
   font-size: 14px;
   font-weight: 600;
-  color: ${colors.gray}
+  color: ${colors.gray};
+  @media (max-width: 480px) {
+    font-size: 10px;
+  }
 `
 
 export const RecentlyPlayedItem = styled.div`
@@ -417,10 +726,69 @@ export const SpotifyWebPlayerStyled = styled(SpotifyWebPlayer)`
 
 export const PlaylistCover = styled.div`
   display: flex;
-  align-items: end;
-  padding: 78px 112px;
-  background: linear-gradient(256.42deg, #212E4C 40.27%, rgba(33, 46, 76, 0.13) 96.22%, rgba(33, 46, 76, 0.63) 100%);
   width: 100%;
+  align-items: end;
+  background: linear-gradient(256.42deg, #212E4C 40.27%, rgba(33, 46, 76, 0.13) 96.22%, rgba(33, 46, 76, 0.63) 100%);
+`
+
+export const PlaylistCoverContainer = styled(Browse)`
+  padding: 0;
+  maring: 0;
+  flex-direction: initial;
+  align-items: flex-end;
+  width: 100%;
+  margin-bottom: 78px;
+  @media (max-width: 1500px) {
+    margin-bottom: 40px;
+  }
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+`
+
+export const AlbumsContainer = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: initial;
+  ${PlayListItem} {
+    &:nth-of-type(3n+2) {
+      margin: 0 36px;
+      @media (max-width: 1700px) {
+        margin: 0 55px;
+      }
+      @media (max-width: 1500px) {
+        margin: 0 25px;
+      }
+      @media (max-width: 1370px) {
+        margin: 0 30px;
+      }
+      @media (max-width: 1320px) {
+        margin: 0 50px;
+      }
+      @media (max-width: 1270px) {
+        margin: 0 25px;
+      }
+      @media (max-width: 1220px) {
+        margin: 0 25px;
+      }
+      @media (max-width: 1170px) {
+        margin: 0 15px;
+      }
+      @media (max-width: 1150px) {
+        margin: 0 35px;
+      }
+      @media (max-width: 1120px) {
+        margin: 0 10px;
+      }
+      @media (max-width: 1090px) {
+        margin: 0 15px;
+      }
+      @media (max-width: 768px) {
+        margin: 0 0;
+      }
+    }
+  }
 `
 
 export const PlaylistScreen = styled.div`
@@ -434,6 +802,10 @@ export const PlaylistAlbumTotalTracks = styled.div`
   line-height: 26px;
   letter-spacing: 0.02em;
   color: ${colors.base};
+  @media (max-width: 480px) {
+    font-size: 18px;
+    margin-top: 5px;
+  }
 `
 
 export const PlaylistAlbumArtist = styled.div`
@@ -452,15 +824,28 @@ export const PlaylistAlbumName = styled.div`
   line-height: 63px;
   letter-spacing: 0.02em;
   color: ${colors.base};
+  @media (max-width: 1350px) {
+    font-size: 44px;
+  }
+  @media (max-width: 1200px) {
+    font-size: 40px;
+  }
+  @media (max-width: 480px) {
+    font-size: 30px;
+    line-height: 44px;
+  }
 `
 
 export const PlaylistAlbumText = styled.div`
-  margin-top: 32px;
+  margin-top: 18px;
   font-weight: 700;
   font-size: 21px;
   line-height: 26px;
   letter-spacing: 0.02em;
   color: ${colors.base};
+  @media (max-width: 480px) {
+    font-size: 18px;
+  }
 `
 
 export const PlaylistImageCover = styled(PlaylistImage)`
@@ -470,6 +855,10 @@ export const PlaylistImageCover = styled(PlaylistImage)`
 export const PlaylistBrowseBlockTracks = styled.div`
   min-width: 50%;
   max-width: 50%;
+  @media (max-width: 480px) {
+    min-width: 85%;
+    max-width: 85%;
+  }
 `
 
 export const PlaylistBrowseBlockSimilarAlbums = styled.div`
@@ -482,14 +871,17 @@ export const PlaylistBrowseBlockSimilarAlbumsContent = styled.div`
   flex-wrap: wrap
 `
 
-export const PlaylistContainer = styled.div`
-  width: ${sizes.container};
+export const PlaylistContainer = styled(Browse)`
   display: flex;
   align-items: flex-start;
   margin-top: 35px;
-  margin-left: 112px;
-  width: ${sizes.container};
-  padding-bottom: 300px;
+  flex-direction: initial;
+  @media (max-width: 992px) {
+    flex-direction: column;
+  }
+  @media (max-width: 480px) {
+    margin-top: 20px;
+  }
 `
 
 export const PlaylistAlbumDescription = styled.div`
@@ -499,6 +891,11 @@ export const PlaylistAlbumDescription = styled.div`
   line-height: 32px;
   letter-spacing: 0.02em;
   color: white;
+  @media (max-width: 480px) {
+    font-size: 16px;
+    margin-bottom: 20px;
+    margin-top: 10px;
+  }
 `
 
 export const SimilarPlaylist = styled(PlaylistImageCover)`
@@ -507,3 +904,4 @@ export const SimilarPlaylist = styled(PlaylistImageCover)`
   max-height: 200px;
   min-height: 200px;
 `
+

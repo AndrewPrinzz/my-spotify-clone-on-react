@@ -1,62 +1,4 @@
 import React from 'react'
-import axios from 'axios'
-import SpotifyWebApi from 'spotify-web-api-node'
-import {useAccessToken, useRefreshToken, useExpiresIn, useTimeStamp} from 'context/auth-context'
-import * as auth from 'auth-provider'
-import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
-
-const REACT_APP_URL = 'http://localhost:3001'
-
-function useAuth() {
-  const code = new URLSearchParams(window.location.search).get('code')
-
-  const [accessToken, setAccessToken] = useAccessToken()
-  const [refreshToken, setRefreshToken] = useLocalStorageState('__auth_provider_refresh_token__')
-  const [expiresIn, setExpiresIn] = useLocalStorageState('__auth_provider_expire_time__')
-  const [timeStamp, setTimestamp] = useLocalStorageState('__auth_provider_token_timestamp__')
-
-  React.useEffect(() => {
-    // if we have access token in our localStorage then we do nothing
-    if (!code) return
-    
-    axios.post(`${REACT_APP_URL}/login`, {
-      code: code
-    }).then(res => {
-      setAccessToken(res.data.accessToken)
-      setRefreshToken(res.data.refreshToken)
-      setExpiresIn(res.data.expiresIn)
-      setTimestamp(Date.now())
-      
-      window.history.pushState({}, null, '/')
-    }).catch((err) => {
-      console.log('err 1: ', err);
-      window.location = '/'
-    })
-  }, [code])
-
-  React.useEffect(() => {
-    if (!refreshToken || !expiresIn) return
-    const interval = setInterval(() => {
-      axios.post(`${REACT_APP_URL}/refresh`, {
-        refreshToken
-      }).then(res => {
-        console.log('Access token has been refreshed');
-
-        setAccessToken(res.data.accessToken)
-        setExpiresIn(res.data.expiresIn)
-        setTimestamp(Date.now())
-      }).catch((err) => {
-        console.log('err 2: ', err);
-        window.location = '/'
-      })
-      // calc time the token will expire (spoiler: it's 3600ms)
-    }, (expiresIn - 60) * 1000);
-
-    return () => clearInterval(interval)
-  }, [refreshToken, expiresIn])
-
-  return accessToken
-}
 
 // Usage: `const [localStorage, setLocalStorage] = useLocalStorageState('key', 'value')`
 // or
@@ -130,15 +72,6 @@ function useSafeDispatch(dispatch) {
 // }, [pokemonName, run])
 const defaultInitialState = {status: 'idle', data: null, error: null, delay: false}
 function useSpotifyData(initialState) {
-  // we need to make sure we have access token
-  const [accessToken] = useAccessToken()
-  
-  React.useEffect(() => {
-    if (!accessToken) return
-  }, [accessToken])
-
-  const spotifyWebApi = useSpotifyWebAPI()
-  spotifyWebApi.setAccessToken(accessToken)
 
   const initialStateRef = React.useRef({
     ...defaultInitialState,
@@ -201,7 +134,7 @@ function useSpotifyData(initialState) {
         },
       )
     },
-    [safeSetState, setData, setError],
+    [safeSetState, setData, setError, delay],
   )
 
   return {

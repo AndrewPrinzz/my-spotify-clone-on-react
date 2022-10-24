@@ -3,7 +3,7 @@ import {jsx} from '@emotion/react'
 
 import React from 'react'
 import * as colors from 'styles/colors'
-import {PlaylistImage, PlayListItem, PlayListTracks, PlayListItemIcon, MusicResults, PlayListTitle} from "components/lib"
+import {PlaylistImage, PlayListItem, PlayListTracks, PlaylistImageMobile, MusicResults, PlayListTitle} from "components/lib"
 import {Play} from "components/icons"
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
 import {SearchResults} from 'components/search-results'
@@ -26,9 +26,7 @@ const fallbackSpotifyData = {
   fetchedAt: 'loading...'
 }
 
-function SpotifyPlaylistInfoFallback({data}) {
-  // get limit to make an object
-  const {limit} = data || 3
+function SpotifyPlaylistInfoFallback({limit = 3}) {
   // making an array for filling data
   const setData = Array(limit).fill(fallbackSpotifyData)
 
@@ -44,10 +42,13 @@ function SpotifyPlaylistDataView({data}) {
       >
         <Link to={`/${type || album_type}/${id}`}>
           <PlaylistImage
-            color={colors.blue}
             cover={images[0].url}
           >
           </PlaylistImage>
+          <PlaylistImageMobile
+            src={images[0].url}
+          >
+          </PlaylistImageMobile>
         </Link>
         <PlayListTitle>{name}</PlayListTitle>
         <PlayListTracks>{tracks.total} tracks</PlayListTracks>
@@ -172,7 +173,7 @@ function SearchForm({
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} css={{width: '100%'}}>
       <small css={{ display: 'block', marginBottom: '10px' }}>
         Try{' '}
         <button

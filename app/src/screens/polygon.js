@@ -17,7 +17,7 @@ import ControllProps from 'components/polygon/advanced-react-patterns/controll-p
 
 injectGlobal`
   body {
-    background: #180c1a;
+    background: linear-gradient(256.42deg, #212E4C 40.27%, rgba(33, 46, 76, 0.13) 96.22%, rgba(33, 46, 76, 0.63) 100%);
     /* padding-bottom: 200px; */
   }
 `

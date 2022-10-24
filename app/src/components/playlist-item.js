@@ -3,8 +3,6 @@ import {PlaylistItem, PlayListTracks, PlayListGenre, PlayListItemIcon} from "com
 import {Play} from "components/icons";
 
 function PlaylistItemTemplate({images, tracks, playlistHeight, ...props}) {
-  console.log('props: ', props);
-  console.log('ffffffff');
   return (
     <PlaylistItem 
       color={colors.blue} 

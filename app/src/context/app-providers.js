@@ -1,39 +1,29 @@
 import {BrowserRouter as Router} from 'react-router-dom'
 import {QueryClient, QueryClientProvider} from 'react-query'
-import {AccessTokenProvider, ExpiresInProvider, RefreshTokenProvider, TimeStampProvider} from 'context/auth-context'
-import {CodeProvider, SpotifyWebAPIProvider} from 'context/spotify-web-api-context'
 import {PlayerProvider, OffsetProvider} from 'context/player-context'
-import {UserDataProvider} from 'context/user-data-context'
 import {SearchQueryProvider} from 'context/search-query-context'
-import {AuthContextNew} from 'context/auth-context'
+import {AuthProvider} from 'context/auth-context'
 
+function PlayerAppProvider({children}) {
+  return (
+    <PlayerProvider>
+      <OffsetProvider>
+        {children}
+      </OffsetProvider>
+    </PlayerProvider>
+  )
+}
 
 function TemporaryAppProviders({children}) {
   return (
     <>
-      <AuthContextNew.Provider value={''}>
-        <CodeProvider>
-          <SearchQueryProvider>
-            <SpotifyWebAPIProvider>
-              <AccessTokenProvider>
-                <UserDataProvider>
-                  <PlayerProvider>
-                    <OffsetProvider>
-                      <ExpiresInProvider>
-                        <RefreshTokenProvider>
-                          <TimeStampProvider>
-                            {children}
-                          </TimeStampProvider>
-                        </RefreshTokenProvider>
-                      </ExpiresInProvider>
-                    </OffsetProvider>
-                  </PlayerProvider>
-                </UserDataProvider>
-              </AccessTokenProvider>
-            </SpotifyWebAPIProvider>
-          </SearchQueryProvider>
-        </CodeProvider>
-      </AuthContextNew.Provider>
+      <AuthProvider>
+        <SearchQueryProvider>
+          <PlayerAppProvider>
+            {children}
+          </PlayerAppProvider>
+        </SearchQueryProvider>
+      </AuthProvider>
     </>
   )
 }
@@ -63,7 +53,6 @@ const queryClient = new QueryClient({
 function AppProviders({children}) {
   return (
     <QueryClientProvider client={queryClient}>
-      
       <Router>
         <TemporaryAppProviders>
           {children}

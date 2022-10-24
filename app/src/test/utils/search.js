@@ -9,16 +9,16 @@ import {
 
 import {useSpotifyData} from 'utils/hooks'
 import {QueryDataCacheProvider} from 'context/query-data-cache-context'
-import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
-import {useAccessToken} from 'context/auth-context'
+import {useAccessToken, useAuth} from 'context/auth-context'
 import {
   SpotifyTrackInfoFallback,
   SpotifyTrackDataView
 } from 'components/tracks'
+import {useAuth} from 'context/auth-context'
 
 function SpotifySearchQueryInfo({searchQuery}) {
   const [accessToken] = useAccessToken()
-  const spotifyApi = useSpotifyWebAPI()
+  const {spotifyApi} = useAuth()
 
   // caching data for a better user expirience
   const [cache, dispatch] = useQueryDataCache()
@@ -58,7 +58,6 @@ function SpotifySearchQueryInfo({searchQuery}) {
   } else if (status === 'rejected') {
     throw error
   } else if (status === 'resolved') {
-    console.log(searchData.body.tracks.items);
     return <SpotifyTrackDataView data={searchData.body.tracks.items} />
   }
 

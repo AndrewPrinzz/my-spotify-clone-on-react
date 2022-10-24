@@ -1,8 +1,7 @@
 /** @jsxImportSource @emotion/react */
 import {jsx}  from '@emotion/react'
 
-import React from 'react'
-import {Greeting, PlayListItems, InterfaceDspr, InterfaceTitle, TrackItems} from 'components/lib'
+import {Greeting, PlayListItems, InterfaceDspr, InterfaceTitle, TrackItems, FullPageSpinner} from 'components/lib'
 import {Browse} from 'components/lib'
 import {ErrorBoundary} from 'react-error-boundary'
 import {
@@ -14,7 +13,6 @@ import {
   SpotifyTrackDataView
 } from 'components/tracks'
 import {ErrorMessage} from 'components/error-fallbacks'
-import {useAccessToken} from 'context/auth-context'
 import {timeGreeting} from 'components/time-greeting'
 import {useTopPlaylists} from 'utils/playlist'
 import {useRecommendedTracks} from 'utils/tracks'
@@ -35,6 +33,7 @@ function SpotifyRecommendations() {
 
 function SpotifyPlaylistInfo() {  
   const {playlists, error, isLoading, isError, isSuccess} = useTopPlaylists()
+  console.log('playlists: ', playlists);
   
   if (isLoading) {
     return <SpotifyPlaylistInfoFallback data={{limit: 3}} />
@@ -48,15 +47,15 @@ function SpotifyPlaylistInfo() {
 }
 
 function Home() {
-  const [accessToken] = useAccessToken()
-
-  React.useEffect(() => {
-    if (!accessToken) return
-  }, [accessToken])
 
   return (
     <Browse>
-      <Greeting>{timeGreeting}</Greeting>
+      <Greeting css={{
+        margin: 0,
+        '@media (max-width: 768px)': {
+          marginTop: '-8px'
+        }
+      }}>{timeGreeting}</Greeting>
       <PlayListItems>
         <ErrorBoundary FallbackComponent={ErrorMessage}>
           <SpotifyPlaylistInfo />

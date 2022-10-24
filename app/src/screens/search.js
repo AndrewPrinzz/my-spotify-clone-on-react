@@ -36,7 +36,7 @@ function Search() {
   return (
     <Browse>
       <SearchForm searchQuery={query} onSubmit={handleSubmit} onChange={handleChange} />
-      <hr />
+      <hr  css={{width: '100%'}} />
       {isError ? (
         <div css={{color: colors.danger}}>
           Sorry, there was an error. Try refreshing the page or log in again.

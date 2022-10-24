@@ -5,28 +5,45 @@ import {InterfaceDspr, InterfaceTitle, LoginContainer, LoginButton} from 'compon
 import {BrowserRouter as Router, Link as RouterLink, Routes, Route, useMatch} from 'react-router-dom'
 import {Polygon} from 'screens/polygon'
 import {timeGreeting} from 'components/time-greeting'
-
-const AUTH_URL =
-  "https://accounts.spotify.com/authorize?client_id=b614d13fd2e74dec81743395e7d0efd6&response_type=code&redirect_uri=http://localhost:3000&scope=streaming%20user-read-email%20user-read-private%20user-top-read%20user-library-read%20user-library-modify%20user-read-playback-state%20user-modify-playback-state"
+import {useAuth} from 'context/auth-context'
+import * as colors from 'styles/colors'
 
 function UnauthenticatedApp() {
   return (
-    <AppRoutes />
+    <Routes>
+      <Route path="/" element={<Login />} />
+      <Route path="/polygon" element={<Polygon />} />
+    </Routes>
   )
 }
 
 function Login() {
+  const {login} = useAuth()
+  
   return (
     <LoginContainer>
-      <InterfaceTitle>{timeGreeting}</InterfaceTitle>
+      <InterfaceTitle
+        css={{
+          '@media (max-width: 480px)': {
+            marginTop: 0,
+            fontSize: '34px'
+          }
+        }}
+      >
+        {timeGreeting}
+      </InterfaceTitle>
       <InterfaceDspr css={{
         maxWidth: '570px',
         textAlign: 'center',
         marginTop: '25px',
       }}>
-        Hi! This app is based on Spotify so you need to login with Spotify to enjoy it. No worries, maybe I won’t steal your account :) (It’s actually impossible, Spotify doesn’t let me do it)
+        Hi! This app is based on Spotify API :) <br /><br /> 
+        
+        This application is currently on Spotify's review so some things might not work here. So <span style={{color: 'red'}}>to use the application with all the functionality</span> you should text me so you can test it. I'll add you to my testers in my developers dashboard! :) After this everything will work swimmingly
+        <br /><br />
+        My WhatsApp is +79081676811. Feel free to text me :)
       </InterfaceDspr>
-      <LoginButton href={AUTH_URL}>
+      <LoginButton href={login}>
         Login with Spotify
       </LoginButton>
       <div css={{
@@ -45,15 +62,6 @@ function Login() {
         marginTop: '10px'
       }}>Let's go</RouterLink>
     </LoginContainer>
-  )
-}
-
-function AppRoutes() {
-  return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/polygon" element={<Polygon />} />
-    </Routes>
   )
 }
 

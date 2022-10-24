@@ -1,13 +1,13 @@
 /** @jsxImportSource @emotion/react */
 import {jsx} from '@emotion/react'
-
 import React from 'react'
+
 import {css} from '@emotion/css'
 import * as colors from 'styles/colors'
-import {BrowserRouter as Router, Link as RouterLink, Routes, Route, useMatch } from 'react-router-dom'
+import {BrowserRouter as Router, Link as RouterLink, Routes, Route, useMatch, useLocation } from 'react-router-dom'
 import {ErrorBoundary} from 'react-error-boundary'
 import {NavBar, NavName, NavPfp, MenuItem } from './components/lib'
-import {Home as HomeIcon, Note as NoteIcon, Playlists as PlaylistIcon, Albums as AlbumIcon} from 'components/icons'
+import {Home as HomeIcon, Note as NoteIcon, Playlists as PlaylistIcon, Albums as AlbumIcon, SearchIcon, LogoutIcon} from 'components/icons'
 import {ErrorMessage, FullPageErrorFallback} from 'components/error-fallbacks'
 import pfp from 'assets/img/navbar/pfp.png'
 import {Home} from 'screens/home'
@@ -17,14 +17,9 @@ import {Album} from 'screens/album'
 import {YourLibrary} from 'screens/your-library'
 import {YourAlbums} from 'screens/your-albums'
 import {NotFoundScreen} from 'screens/not-found'
-import {useLocalStorageState} from 'utils/hooks'
-import {useAccessToken} from 'context/auth-context'
-import * as auth from 'auth-provider'
-import {useSpotifyWebAPI} from 'context/spotify-web-api-context'
+import {useAuth} from 'context/auth-context'
 import {Player} from 'components/player'
-import {LOCALSTORAGE_KEYS} from 'auth-provider'
 import {useQuery} from 'react-query'
-import {AppProviders as Test} from 'context/app-providers'
 
 // If we have an error
 function ErrorFallback({error}) {
@@ -42,47 +37,32 @@ function ErrorFallback({error}) {
   )
 }
 
-function AuthenticatedApp({logout}) {
-  // const [accessToken, setAccessToken] = useAccessToken()
-  // const spotifyApi = useSpotifyWebAPI()
-
-  // const [localStorageAccessToken, setLocalStorageAccessToken] = useLocalStorageState(LOCALSTORAGE_KEYS.accessToken)
-  
-  // const getToken = auth.getToken()
-  
-  // const getAccessToken = localStorageAccessToken ? localStorageAccessToken : getToken
-  
-  // // 
-  // React.useEffect(() => {
-  //   if (!getAccessToken) return
-  //   // 👩‍🏫 We use this awesome API in the entire app: `https://github.com/thelinmichael/spotify-web-api-node`
-  //   spotifyApi.setAccessToken(getAccessToken)
-  //   setAccessToken(getAccessToken)
-  //   setLocalStorageAccessToken(getAccessToken)
-  // }, [getAccessToken])
+function AuthenticatedApp() {
 
   return (
-      // Error boundary provider
-      <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
-          <div className={css`
-            background: linear-gradient(101.32deg, #292929 1.55%, #1E1322 90.79%);
-            display: flex;
-          `}>
-            <Nav logout={logout} />
+    // Error boundary provider
+    <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
+        <div className={css`
+          background: linear-gradient(101.32deg, #292929 1.55%, #1E1322 90.79%);
+          display: flex;
+        `}>
+          <Nav />
+          <div css={{width: '100%'}}>
             {/* If we have an error we show an error we've written above */}
             <ErrorBoundary FallbackComponent={ErrorFallback}>
               <AppRoutes />
             </ErrorBoundary>
-            <div css={{
-              position: 'fixed',
-              bottom: '0',
-              width: '100%',
-              background: '#000'
-            }}>
-              <Player />
-            </div>
           </div>
-      </ErrorBoundary>
+          <div css={{
+            position: 'fixed',
+            bottom: '0',
+            width: '100%',
+            background: '#000'
+          }}>
+            <Player />
+          </div>
+        </div>
+    </ErrorBoundary>
   )
 }
 
@@ -122,7 +102,10 @@ function NavLink(props) {
             transition: '0.5s',
             fill: colors.base
           }
-        }
+        },
+        '@media (max-width: 992px)': {
+          borderRight: '0'
+        }        
       }
         : null}
         `}
@@ -131,31 +114,13 @@ function NavLink(props) {
   )
 }
 
-const fallbackUserData = {
-  body: {
-    "display_name": "Loading...",
-    "email": "Loading...",
-    "id": "Loading...",
-    "images": [
-      {
-        "url": 'fallbackSpotify'
-      }
-    ],
-    // we can recognize here either the user is `premium` or not
-    "product": "loading...",
-  }
-}
-
 function Nav() {
-  const spotifyWebApi = useSpotifyWebAPI()
-
-  const logout = auth.logout
+  const {logout, spotifyApi} = useAuth()
 
   const {data: user, isLoading, isSuccess, isLoadingError} = useQuery({
     queryKey: 'user',
-    queryFn: () => spotifyWebApi.getMe()
+    queryFn: () => spotifyApi.getMe()
   })
-  console.log('isLoadingError: ', isLoadingError);
 
   return (
     <NavBar className={css`
@@ -200,41 +165,57 @@ function Nav() {
         </li>
         <li>
           <NavLink to="/search">
-            <NoteIcon />
+            <SearchIcon />
             <MenuItem>Search</MenuItem>
           </NavLink>
         </li>
         <li>
           <NavLink to="/your-library">
-            <PlaylistIcon />
+            <NoteIcon />
             <MenuItem>Your Library</MenuItem>
           </NavLink>
         </li>
         <li>
           <NavLink to="/your-albums">
-            <AlbumIcon />
+            <PlaylistIcon />
             <MenuItem>Your Albums</MenuItem>
           </NavLink>
         </li>
       </ul>
       <a
         css={{
+          display: 'flex',
+          alignItems: 'center',
           marginTop: '45px',
           color: '#fff',
-          display: 'block',
           cursor: 'pointer',
           textTransform: 'uppercase',
           textDecoration: 'underline',
           fontWeight: 'bold',
-          marginTop: '45px'
+          marginTop: '90px',
         }}
         onClick={logout}
-      >logout</a>
+      >
+        <LogoutIcon />
+        <span
+          css={{
+            display: 'flex',
+            marginLeft: '10px',
+            '@media (max-width: 992px)': {
+              display: 'none'
+            }
+          }}
+        >
+          logout
+        </span>
+      </a>
     </NavBar>
   )
 }
 
 function AppRoutes() {
+  const location = useLocation()
+
   return (
     <Routes>
       <Route path="/" element={<Home />} />

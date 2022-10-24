@@ -1,6 +1,5 @@
 /** @jsxImportSource @emotion/react */
 import {jsx} from '@emotion/react'
-import React from 'react'
 
 import {css} from '@emotion/css'
 import * as colors from 'styles/colors'

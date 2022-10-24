@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { css } from '@emotion/css'
-import { Menu, MenuIcon } from 'components/lib'
+import {MenuIcon } from 'components/lib'
 import * as colors from 'styles/colors'
 
 const Home = ({fill = `${colors.gray}`}) => {

@@ -62,7 +62,7 @@ function AuthProvider(props) {
       // console.log('Milliseconds since token was set: ', (Date.now() - timeStamp))
       // console.log('Milliseconds token will expire: ', expiresIn * 1000 - (Date.now() - timeStamp))
       // console.log('milliseconds token will be reset ', (expiresIn * 1000) - (10800) - (Date.now() - timeStamp))
-      console.log('minutes token will be reset ', ((expiresIn * 1000) - (10800) - (Date.now() - timeStamp)) / 60 / 1000)
+      // console.log('minutes token will be reset ', ((expiresIn * 1000) - (10800) - (Date.now() - timeStamp)) / 60 / 1000)
 
       // once we got data from loggining in we just set it
       if (data) setAuthData(data)

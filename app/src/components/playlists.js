@@ -2,14 +2,11 @@
 import {jsx} from '@emotion/react'
 
 import React from 'react'
-import * as colors from 'styles/colors'
 import {PlaylistImage, PlayListItem, PlayListTracks, PlaylistImageMobile, MusicResults, PlayListTitle} from "components/lib"
-import {Play} from "components/icons"
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'
 import {SearchResults} from 'components/search-results'
 import {ErrorBoundary} from 'react-error-boundary'
 import {usePlayer} from 'context/player-context'
-import axios from 'axios'
 import {SearchBox} from 'components/lib'
 import {Link} from 'react-router-dom'
 
@@ -134,32 +131,7 @@ function SearchForm({
     }
   }, [externalSearchQuery])
 
-  const [playingTrack, setPlayingTrack] = React.useState()
-  const [lyrics, setLyrics] = React.useState()
-
-  function chooseTrack(track) {
-    setPlayingTrack(track)
-    // setSearch('')
-    // setLyrics('')
-  }
-
-  // lyrics
-  React.useEffect(() => {
-    if (!playingTrack) return
-
-    axios.get('http://localhost:3001/lyrics', {
-      params: {
-        track: playingTrack.title,
-        artist: playingTrack.artist
-      }
-    }).then(res => {
-      setLyrics(res.data.lyrics)
-    })
-  })
-
   function handleChange(e) {
-    // if (!e.target.value) return
-    // setSearch(e.target.value)
     onChange(e)
   }
 

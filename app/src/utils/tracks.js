@@ -1,4 +1,3 @@
-import React from 'react'
 import {useQuery, useInfiniteQuery} from 'react-query'
 import {useAuth} from 'context/auth-context'
 import fallbackSpotify from 'assets/img/spotify/fallback-spotify.jpg'

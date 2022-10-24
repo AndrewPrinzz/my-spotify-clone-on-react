@@ -1,5 +1,5 @@
 import * as colors from 'styles/colors'
-import {PlaylistItem, PlayListTracks, PlayListGenre, PlayListItemIcon} from "components/lib";
+import {PlaylistItem, PlayListTracks, PlayListItemIcon} from "components/lib";
 import {Play} from "components/icons";
 
 function PlaylistItemTemplate({images, tracks, playlistHeight, ...props}) {

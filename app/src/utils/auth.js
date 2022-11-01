@@ -77,7 +77,8 @@ function useAuthDataForContext() {
 }
 
 function getRefreshToken(refreshToken, setAuthData) {
-  return axios.post(`${process.env.REACT_APP_URL}/refresh`, {
+  // return axios.post(`${process.env.REACT_APP_URL}/refresh`, {
+  return axios.post(`${'http://localhost:3001'}/refresh`, {
     refreshToken
   }).then(res => {
     setAuthData(res)
@@ -88,7 +89,8 @@ function getRefreshToken(refreshToken, setAuthData) {
 }
 
 function getAccessToken() {
-  return axios.post(`${process.env.REACT_APP_URL}/login`, {
+  // return axios.post(`${process.env.REACT_APP_URL}/login`, {
+  return axios.post(`${'http://localhost:3001'}/login`, {
     code: code
   }).then(res => {
     window.history.pushState({}, null, '/')

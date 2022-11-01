@@ -7,7 +7,8 @@ function useGetToken() {
     // if we have access token in our localStorage then we do nothing
     if (!code) return
 
-    axios.post(`${process.env.REACT_APP_URL}/login`, {
+    // axios.post(`${process.env.REACT_APP_URL}/login`, {
+    axios.post(`${'http://localhost:3001'}/login`, {
       code: code
     }).then(res => {
       // setAccessToken(res.data.accessToken)
@@ -36,7 +37,8 @@ function useGetToken() {
   React.useEffect(() => {
     if (!refreshToken || !expiresIn) return
     const interval = setInterval(() => {
-      axios.post(`${process.env.REACT_APP_URL}/refresh`, {
+      // axios.post(`${process.env.REACT_APP_URL}/refresh`, {
+      axios.post(`${'http://localhost:3001'}/refresh`, {
         refreshToken
       }).then(res => {
 

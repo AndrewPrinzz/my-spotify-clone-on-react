@@ -135,13 +135,13 @@ function Nav() {
         <br />
         {isLoading ? (
           <>
-            <NavPfp src={pfp} />
+            <NavPfp src={''} />
             <NavName>Loading...</NavName>
           </>
         ) : isSuccess ? (
           <>
-            {/* <NavPfp src={user.body.images[0].url} /> */}
-            <NavPfp src={pfp} />
+            <NavPfp src={user.body.images[0].url} />
+            {/* <NavPfp src={pfp} /> */}
             <NavName>
               {user.body.display_name}
             </NavName>

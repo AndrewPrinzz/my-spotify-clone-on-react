@@ -13,8 +13,7 @@ const userPromise = getAccessToken()
 
 function AuthProvider(props) {
   const spotifyApi = new SpotifyWebApi({
-    // clientId: process.env.REACT_APP_CLIENT_ID
-    clientId: 'b614d13fd2e74dec81743395e7d0efd6'
+    clientId: process.env.REACT_APP_CLIENT_ID
   })
 
   const {

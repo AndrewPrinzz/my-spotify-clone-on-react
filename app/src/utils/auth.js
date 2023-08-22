@@ -1,8 +1,8 @@
 import React from 'react'
 
 import axios from "axios"
-import {useQueryClient} from 'react-query'
-import {useLocalStorageState} from 'utils/hooks'
+import { useQueryClient } from 'react-query'
+import { useLocalStorageState } from 'utils/hooks'
 
 const code = new URLSearchParams(window.location.search).get('code')
 

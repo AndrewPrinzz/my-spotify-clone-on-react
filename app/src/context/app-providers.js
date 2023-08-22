@@ -1,10 +1,10 @@
-import {BrowserRouter as Router} from 'react-router-dom'
-import {QueryClient, QueryClientProvider} from 'react-query'
-import {PlayerProvider, OffsetProvider} from 'context/player-context'
-import {SearchQueryProvider} from 'context/search-query-context'
-import {AuthProvider} from 'context/auth-context'
+import { BrowserRouter as Router } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from 'react-query'
+import { PlayerProvider, OffsetProvider } from 'context/player-context'
+import { SearchQueryProvider } from 'context/search-query-context'
+import { AuthProvider } from 'context/auth-context'
 
-function PlayerAppProvider({children}) {
+function PlayerAppProvider({ children }) {
   return (
     <PlayerProvider>
       <OffsetProvider>
@@ -14,7 +14,7 @@ function PlayerAppProvider({children}) {
   )
 }
 
-function TemporaryAppProviders({children}) {
+function TemporaryAppProviders({ children }) {
   return (
     <>
       <AuthProvider>
@@ -50,7 +50,7 @@ const queryClient = new QueryClient({
   }
 })
 
-function AppProviders({children}) {
+function AppProviders({ children }) {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
@@ -62,4 +62,4 @@ function AppProviders({children}) {
   )
 }
 
-export {AppProviders}
+export { AppProviders }

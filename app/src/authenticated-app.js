@@ -1,27 +1,27 @@
 /** @jsxImportSource @emotion/react */
-import {jsx} from '@emotion/react'
+import { jsx } from '@emotion/react'
 
-import {css} from '@emotion/css'
+import { css } from '@emotion/css'
 import * as colors from 'styles/colors'
-import {BrowserRouter as Router, Link as RouterLink, Routes, Route, useMatch, useLocation } from 'react-router-dom'
-import {ErrorBoundary} from 'react-error-boundary'
-import {NavBar, NavName, NavPfp, MenuItem } from './components/lib'
-import {Home as HomeIcon, Note as NoteIcon, Playlists as PlaylistIcon, Albums as AlbumIcon, SearchIcon, LogoutIcon} from 'components/icons'
-import {ErrorMessage, FullPageErrorFallback} from 'components/error-fallbacks'
-import pfp from 'assets/img/navbar/pfp.png'
-import {Home} from 'screens/home'
-import {Playlist} from 'screens/playlist'
-import {Search} from 'screens/search'
-import {Album} from 'screens/album'
-import {YourLibrary} from 'screens/your-library'
-import {YourAlbums} from 'screens/your-albums'
-import {NotFoundScreen} from 'screens/not-found'
-import {useAuth} from 'context/auth-context'
-import {Player} from 'components/player'
-import {useQuery} from 'react-query'
+import { BrowserRouter as Router, Link as RouterLink, Routes, Route, useMatch, useLocation } from 'react-router-dom'
+import { ErrorBoundary } from 'react-error-boundary'
+import { NavBar, NavName, NavPfp, MenuItem } from './components/lib'
+import { Home as HomeIcon, Note as NoteIcon, Playlists as PlaylistIcon, Albums as AlbumIcon, SearchIcon, LogoutIcon } from 'components/icons'
+import { ErrorMessage, FullPageErrorFallback } from 'components/error-fallbacks'
+import pfp from 'assets/img/download.jpg'
+import { Home } from 'screens/home'
+import { Playlist } from 'screens/playlist'
+import { Search } from 'screens/search'
+import { Album } from 'screens/album'
+import { YourLibrary } from 'screens/your-library'
+import { YourAlbums } from 'screens/your-albums'
+import { NotFoundScreen } from 'screens/not-found'
+import { useAuth } from 'context/auth-context'
+import { Player } from 'components/player'
+import { useQuery } from 'react-query'
 
 // If we have an error
-function ErrorFallback({error}) {
+function ErrorFallback({ error }) {
   return (
     <ErrorMessage
       error={error}
@@ -41,26 +41,26 @@ function AuthenticatedApp() {
   return (
     // Error boundary provider
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
-        <div className={css`
+      <div className={css`
           background: linear-gradient(101.32deg, #292929 1.55%, #1E1322 90.79%);
           display: flex;
         `}>
-          <Nav />
-          <div css={{width: '100%'}}>
-            {/* If we have an error we show an error we've written above */}
-            <ErrorBoundary FallbackComponent={ErrorFallback}>
-              <AppRoutes />
-            </ErrorBoundary>
-          </div>
-          <div css={{
-            position: 'fixed',
-            bottom: '0',
-            width: '100%',
-            background: '#000'
-          }}>
-            <Player />
-          </div>
+        <Nav />
+        <div css={{ width: '100%' }}>
+          {/* If we have an error we show an error we've written above */}
+          <ErrorBoundary FallbackComponent={ErrorFallback}>
+            <AppRoutes />
+          </ErrorBoundary>
         </div>
+        <div css={{
+          position: 'fixed',
+          bottom: '0',
+          width: '100%',
+          background: '#000'
+        }}>
+          <Player />
+        </div>
+      </div>
     </ErrorBoundary>
   )
 }
@@ -104,7 +104,7 @@ function NavLink(props) {
         },
         '@media (max-width: 992px)': {
           borderRight: '0'
-        }        
+        }
       }
         : null}
         `}
@@ -114,9 +114,9 @@ function NavLink(props) {
 }
 
 function Nav() {
-  const {logout, spotifyApi} = useAuth()
+  const { logout, spotifyApi } = useAuth()
 
-  const {data: user, isLoading, isSuccess, isLoadingError} = useQuery({
+  const { data: user, isLoading, isSuccess, isLoadingError } = useQuery({
     queryKey: 'user',
     queryFn: () => spotifyApi.getMe()
   })
@@ -140,8 +140,8 @@ function Nav() {
           </>
         ) : isSuccess ? (
           <>
-            <NavPfp src={user.body.images[0].url} />
-            {/* <NavPfp src={pfp} /> */}
+            {/* <NavPfp src={user.body.images[0].url} /> */}
+            <NavPfp src={pfp} />
             <NavName>
               {user.body.display_name}
             </NavName>

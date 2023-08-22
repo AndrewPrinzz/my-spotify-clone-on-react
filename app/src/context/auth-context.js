@@ -1,9 +1,9 @@
 import React from 'react'
 
 import SpotifyWebApi from 'spotify-web-api-node'
-import {useSpotifyData} from 'utils/hooks'
-import {getAccessToken, getRefreshToken, useAuthDataForContext} from 'utils/auth'
-import {FullPageSpinner} from 'components/lib'
+import { useSpotifyData } from 'utils/hooks'
+import { getAccessToken, getRefreshToken, useAuthDataForContext } from 'utils/auth'
+import { FullPageSpinner } from 'components/lib'
 
 const AuthContext = React.createContext()
 AuthContext.displayName = 'AuthContext'
@@ -36,7 +36,7 @@ function AuthProvider(props) {
     setAuthDataFromLocalStorage
   } = useAuthDataForContext(spotifyApi)
 
-  const {run: refreshTokenRun} = useSpotifyData()
+  const { run: refreshTokenRun } = useSpotifyData()
 
   React.useEffect(() => {
     // if we have the user's token in local storage we set it for refreshing the refresh token
@@ -44,7 +44,7 @@ function AuthProvider(props) {
       setAuthDataFromLocalStorage()
       run(Promise.resolve())
       return
-    } 
+    }
     // if access token expired then we clear all the data
     clearAuthData(spotifyApi)
     run(userPromise)
@@ -74,8 +74,8 @@ function AuthProvider(props) {
         // we’re essentially gonna refresh three minutes before it expires
         (expiresIn * 1000) - (10800) - (Date.now() - timeStamp)
       )
-        return () => clearInterval(interval)
-      }
+      return () => clearInterval(interval)
+    }
   }, [data, accessToken, refreshTokenRun])
 
   const login =
@@ -87,12 +87,12 @@ function AuthProvider(props) {
   }
 
   // anytime you pass a value to a provider if you’re creating that value during render that’s gonna trigger all of the consumers to render anytime this provider rerenders. Because if the provider value changes between renders all the consumers will be rerendered to get that change update. 
-  const value = React.useMemo(() => ({login, logout, accessToken, spotifyApi}), [
-    login, 
-    logout, 
-    accessToken, 
+  const value = React.useMemo(() => ({ login, logout, accessToken, spotifyApi }), [
+    login,
+    logout,
+    accessToken,
     spotifyApi
-  ]) 
+  ])
 
   if (isLoading || isIdle) {
     return <FullPageSpinner />
@@ -105,7 +105,7 @@ function AuthProvider(props) {
   if (isSuccess || accessToken) {
     if (accessToken) {
       spotifyApi.setAccessToken(accessToken)
-    }    
+    }
 
     return (
       <AuthContext.Provider value={value} {...props} />

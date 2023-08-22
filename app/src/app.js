@@ -1,9 +1,9 @@
 import React from 'react'
-import {useAuth} from 'context/auth-context'
-import {FullPageSpinner} from 'components/lib'
+import { useAuth } from 'context/auth-context'
+import { FullPageSpinner } from 'components/lib'
 
 // If we're on the UnauthenticatedApp page then we don't load the AuthenticatedApp
-const AuthenticatedApp = React.lazy(() => 
+const AuthenticatedApp = React.lazy(() =>
   import(/* webpackPrefetch: true */ './authenticated-app')
 )
 
@@ -11,8 +11,8 @@ const AuthenticatedApp = React.lazy(() =>
 const UnauthenticatedApp = React.lazy(() => import('./unauthenticated-app'))
 
 function App() {
-  const {data, accessToken} = useAuth()
-  
+  const { data, accessToken } = useAuth()
+
   return (
     <React.Suspense fallback={<FullPageSpinner />}>
       {data || accessToken ? (

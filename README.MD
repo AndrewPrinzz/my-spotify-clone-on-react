@@ -35,18 +35,18 @@ A Spotify Clone created with my design. I created this clone to gain experience 
 
 ### 1. Backend ⚙️
 
-1. **Linking Spotify API to my Backend and Frontend:** I began by connecting the backend and frontend of my application. The goal was to retrieve some data from my Spotify Account.
+- `Linking Spotify API to my Backend and Frontend:` I began by connecting the backend and frontend of my application. The goal was to retrieve some data from my Spotify Account.
 
 ### 2. Frontend ⚙️
 
-1. **Design Implementation:** Transformed my Figma designs into a live application.
-2. **Login Functionality:** Create login page for authentication via Spotify credentials.
-3. **Main page:** Showcases personalized recommendation list and the most popular albums on Spotify.
-4. **Music Player Integration:** Toggle between tracks and save to the user library.
-5. **Music Search Page:** Explore the vast collection of tracks and albums in Spotify's repository.
-6. **Your Library Page:** View your saved music.
-7. **Data Caching:** Managed data across different pages, reducing server requests. For instance, a track saved on the **main page** instantly reflects in the **Your Library** page.
-8. **All screens support.** Responsive design that aligns perfectly across different screen sizes and resolutions.
+- `Design Implementation:` Transformed my Figma designs into a live application.
+- `Login Functionality:` Create login page for authentication via Spotify credentials.
+- `Main page:` Showcases personalized recommendation list and the most popular albums on Spotify.
+- `Music Player Integration:` Toggle between tracks and save to the user library.
+- `Music Search Page:` Explore the vast collection of tracks and albums in Spotify's repository.
+- `Your Library Page:` View your saved music.
+- `Data Caching:` Managed data across different pages, reducing server requests. For instance, a track saved on the **main page** instantly reflects in the **Your Library** page.
+- `All screens support.` Responsive design that aligns perfectly across different screen sizes and resolutions.
 
 ### 3. Install the application on a VPS server ⚙️
 
